@@ -393,7 +393,7 @@
       transition: width 0.5s;
     }
     
-    /* --- CSS MIMAR GATO (NUEVO) --- */
+    /* --- CSS MIMAR GATO --- */
     .mimar-section {
       margin-top: 20px;
       border-top: 1px solid var(--card);
@@ -486,7 +486,7 @@
         <div class="card" id="tab-content"></div>
       </section>
     </main>
-    <footer>Llego — “Vida RPG” para los tremendos gordacos </footer>
+    <footer>Reproducción visual de tu hoja de Google Sheets — “Vida RPG”</footer>
   </div>
 
   <script>
@@ -571,8 +571,8 @@
         maxEnergy: 100,
         onExpedition: false,
         expeditionEnds: null,
-        mimosToday: 0, // <-- NUEVO
-        lastMimoReset: new Date().toDateString() // <-- NUEVO
+        mimosToday: 0, 
+        lastMimoReset: new Date().toDateString() 
       }
     },
     // --- LISTA COMPLETA DE 40 MISIONES ---
@@ -645,7 +645,7 @@
     ],
     system: {
       lastHabitReset: new Date().toDateString(),
-      adminMode: false 
+      adminMode: true 
     },
     // --- LISTA COMPLETA DE 15 LOGROS ---
     achievements: [
@@ -690,7 +690,7 @@
       const targetValue = target[key];
       const sourceValue = source[key];
       if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-         // Usa el array guardado si existe, si no, el inicial
+        // Usa el array guardado si existe, si no, el inicial
         target[key] = savedState && savedState[key] ? savedState[key] : sourceValue;
       } else if (isObject(targetValue) && isObject(sourceValue)) {
         target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
@@ -702,12 +702,12 @@
   }
   
   let state = mergeDeep(JSON.parse(JSON.stringify(INITIAL)), savedState || {});
-  // Añadir estado de casino y compañero si no existen en el save
+  // Asegurar que campos añadidos después existen
   if (!state.casinoGame) state.casinoGame = INITIAL.casinoGame;
   if (!state.player.companion) state.player.companion = INITIAL.player.companion;
   if (!state.player.lastCasinoVisit) state.player.lastCasinoVisit = INITIAL.player.lastCasinoVisit;
-  if (state.player.companion.mimosToday === undefined) state.player.companion.mimosToday = 0; // Para saves antiguos
-  if (!state.player.companion.lastMimoReset) state.player.companion.lastMimoReset = new Date().toDateString(); // Para saves antiguos
+  if (state.player.companion.mimosToday === undefined) state.player.companion.mimosToday = 0; 
+  if (!state.player.companion.lastMimoReset) state.player.companion.lastMimoReset = new Date().toDateString(); 
 
 
   // Recalcular Max HP al cargar
@@ -906,7 +906,7 @@
     }
   }
   
-  // --- LÓGICA MIMAR GATO (NUEVO) ---
+  // --- LÓGICA MIMAR GATO ---
   function checkMimoReset() {
     const today = new Date().toDateString();
     if (state.player.companion.lastMimoReset !== today) {
@@ -1408,7 +1408,7 @@
     if (state.system.lastHabitReset !== today) {
       state.habits.forEach(h => h.countToday = 0);
       state.system.lastHabitReset = today;
-      saveState();
+      // No guardar aquí, se guarda en otro lado
     }
   }
 
@@ -1429,8 +1429,7 @@
           `<option value="${d}" ${m.difficulty === d ? 'selected' : ''}>${d}</option>`
         ).join('');
         difficultyCell = `<td>
-            <select id="mission-diff-${m.id}">
-              ${difficultyOptions}
+            <select id="mission-diff-${m.id}" onchange="updateMission(${m.id})"> ${difficultyOptions}
             </select>
           </td>`;
       } else {
@@ -1443,12 +1442,10 @@
 
       html += `<tr>
         <td>${m.id}</td>
-        <td><input type="text" id="mission-title-${m.id}" value="${escapeHtml(m.title)}"></td>
-        ${difficultyCell}
+        <td><input type="text" id="mission-title-${m.id}" value="${escapeHtml(m.title)}" onchange="updateMission(${m.id})"></td> ${difficultyCell}
         <td>${m.status === 'Completada' && m.cooldownHours > 0 ? 'Enfriando...' : escapeHtml(m.status)}</td>
         <td>${m.reward.xp || 0} XP, ${m.reward.credits || 0} C</td>
         <td>
-          <button class="button" onclick="updateMission(${m.id})">Guardar</button>
           ${actionButton}
         </td>
       </tr>`;
@@ -1484,6 +1481,7 @@
     };
   }
 
+  // --- updateMission() (Ahora se llama al cambiar input/select) ---
   function updateMission(missionId) {
     const mission = state.missions.find(m => m.id === missionId);
     if (!mission) return;
@@ -1504,13 +1502,16 @@
         }
       }
     }
-    saveState();
-    renderTab("Missions");
+    saveState(); // Guardar inmediatamente al editar
+    // No refrescar aquí para permitir seguir editando
   }
 
   function completeMission(missionId) {
     const mission = state.missions.find(m => m.id === missionId);
     if (!mission || mission.status !== 'Pendiente') return; 
+
+    // Guardar cambios pendientes antes de completar
+    updateMission(missionId); 
 
     // 1. Aplicar recompensa
     applyEffect(mission.reward);
@@ -1580,7 +1581,6 @@
     let html = `<h2>🛒 Tienda</h2><table>
       <thead><tr><th>Ítem</th><th>Efecto</th><th>Precio</th><th>Acción</th></tr></thead><tbody>`;
     
-    // Calcular descuento de Carisma
     const priceModifier = 1 - (state.player.attributes.car * 0.005) - (state.player.skills.c1 ? 0.10 : 0);
     
     state.store.forEach(s => {
@@ -1625,12 +1625,8 @@
     
     if (!item || state.player.credits < finalPrice) return; 
     
-    // 1. Pagar
     state.player.credits -= finalPrice;
-    
-    // 2. Añadir al inventario
-    state.player.inventory.push(JSON.parse(JSON.stringify(item))); // Clonar item
-    
+    state.player.inventory.push(JSON.parse(JSON.stringify(item))); 
     state.player.diary.push(`¡Compraste "${item.item}"!`);
     
     checkAchievements(null, 'buy_item'); 
@@ -1714,12 +1710,12 @@
       // --- ¡GANA! ---
       state.casinoGame.round++;
       state.casinoGame.pot *= 2;
-      alert(`¡GANASTE! 🎉\n\nTu pozo ahora es de ${state.casinoGame.pot} Créditos.\n¿Seguirás jugando?`); // <-- MENSAJE GANADOR
+      alert(`¡GANASTE! 🎉\n\nTu pozo ahora es de ${state.casinoGame.pot} Créditos.\n¿Seguirás jugando?`); 
       state.player.diary.push(`¡DOBLE en el Casino! El pozo sube a ${state.casinoGame.pot}C.`);
     } else {
       // --- ¡PIERDE! ---
       const lostPot = state.casinoGame.pot;
-      alert(`¡PERDISTE! 😭\n\nHas perdido el pozo de ${lostPot} Créditos.\n¡Más suerte la próxima vez!`); // <-- MENSAJE PERDEDOR
+      alert(`¡PERDISTE! 😭\n\nHas perdido el pozo de ${lostPot} Créditos.\n¡Más suerte la próxima vez!`); 
       state.player.diary.push(`¡PERDISTE en el Casino! El pozo de ${lostPot}C se ha perdido.`);
       state.player.lastCasinoVisit = Date.now(); // Poner cooldown
       state.casinoGame = { active: false, pot: 0, round: 0 };
@@ -1735,7 +1731,7 @@
     
     const winnings = state.casinoGame.pot;
     state.player.credits += winnings;
-    alert(`¡Te retiras con ${winnings} Créditos! 💰`); // <-- MENSAJE RETIRADA
+    alert(`¡Te retiras con ${winnings} Créditos! 💰`); 
     state.player.diary.push(`¡Te retiras del casino con ${winnings}C!`);
     
     state.player.lastCasinoVisit = Date.now(); // Poner cooldown
@@ -1832,7 +1828,7 @@
       achievement.unlocked = true;
       state.player.diary.push(`¡LOGRO DESBLOQUEADO: ${achievement.title}!`);
       saveState();
-      // No llamar a renderAll() aquí para evitar bucles, se llamará después
+      // No llamar a renderAll() aquí para evitar bucles
     }
   }
 
@@ -1873,8 +1869,8 @@
       </div>
       
       <div style="margin-top: 15px;">
-        <label>Forzar reseteo de contadores de hábitos</label>
-        <button class="button" id="btn-reset-habits" style="background: var(--accent2);">Resetear Hábitos</button>
+        <label>Forzar reseteo de contadores de hábitos y mimos</label>
+        <button class="button" id="btn-reset-habits" style="background: var(--accent2);">Resetear Contadores</button>
       </div>
       
       <hr style="border:1px solid var(--card); margin: 20px 0;">
@@ -1896,10 +1892,11 @@
     document.getElementById('btn-reset-habits').onclick = () => {
       state.habits.forEach(h => h.countToday = 0);
       state.system.lastHabitReset = new Date().toDateString();
-      state.player.companion.mimosToday = 0; // También resetea mimos
+      state.player.companion.mimosToday = 0; 
       state.player.companion.lastMimoReset = new Date().toDateString();
       saveState();
       renderTab("Configuración");
+      renderTab("Player"); // Refrescar mimos en Player
     };
     
     document.getElementById('btn-wipe-save').onclick = () => {
@@ -1964,7 +1961,7 @@
     
     // 3. Diario
     let diaryEl = document.getElementById("diary");
-    // CORRECCIÓN BUG 2: Asegurar que diary es un array antes de mapear
+    // CORRECCIÓN BUG: Asegurar que diary es un array
     diaryEl.innerHTML = (Array.isArray(state.player.diary) ? state.player.diary : []).map(e => `<div>${escapeHtml(String(e))}</div>`).join("");
     diaryEl.scrollTop = diaryEl.scrollHeight;
     
@@ -1973,7 +1970,7 @@
   }
 
   // --- INICIALIZACIÓN ---
-  checkMimoReset(); // <-- Chequea al cargar
+  checkMimoReset(); 
   checkHabitReset(); 
   checkMissionCooldowns(); 
   checkCompanion(); 
@@ -1987,10 +1984,10 @@
     const tabActual = document.querySelector(".tab.active")?.textContent;
     checkMissionCooldowns();
     checkCompanion(); 
-    checkMimoReset(); // <-- Revisa si es nuevo día
+    checkMimoReset(); 
     
     if (tabActual === "Missions") renderTab("Missions");
-    if (tabActual === "Player") renderTab("Player"); // Para botones
+    if (tabActual === "Player") renderTab("Player"); 
     if (tabActual === "Compañero") renderTab("Compañero"); 
     if (tabActual === "Casino") renderTab("Casino"); 
     
