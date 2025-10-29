@@ -1610,6 +1610,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     // 1. Aplicar recompensa
     applyEffect(mission.reward);
+    // --- INICIO: LÓGICA DE LOOT DROP ---
+const lootChance = 0.10; // 10% de probabilidad
+if (Math.random() < lootChance) {
+  // ¡Loot! Vamos a dar una Poción de Salud (ID 1 de la tienda)
+  const lootItem = state.store.find(i => i.id === 1);
+  if (lootItem) {
+    state.player.inventory.push(JSON.parse(JSON.stringify(lootItem)));
+    state.player.diary.push(`¡Suerte! Encontraste un/a "${lootItem.item}" al completar la misión.`);
+  }
+}
+// --- FIN: LÓGICA DE LOOT DROP ---
+
     state.player.totalMissionsDone++;
 
     // 2. Marcar misión
