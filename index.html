@@ -667,7 +667,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         expeditionEnds: null,
         mimosToday: 0, 
         lastMimoReset: new Date().toDateString() 
-      }
+      },// --- DATOS DE LOGIN ---
+lastLoginDate: null,
+loginStreak: 0
     },
     // --- LISTA COMPLETA DE 40 MISIONES ---
     missions: [
@@ -802,6 +804,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   if (!state.player.lastCasinoVisit) state.player.lastCasinoVisit = INITIAL.player.lastCasinoVisit;
   if (state.player.companion.mimosToday === undefined) state.player.companion.mimosToday = 0; 
   if (!state.player.companion.lastMimoReset) state.player.companion.lastMimoReset = new Date().toDateString(); 
+  if (state.player.loginStreak === undefined) state.player.loginStreak = 0;
+  if (!state.player.lastLoginDate) state.player.lastLoginDate = null;
 
 
   // Recalcular Max HP al cargar
@@ -2206,6 +2210,43 @@ function endMinigame() {
   saveState();
   renderAll();
 }
+// --- LÓGICA DE RECOMPENSA DIARIA (LOGIN STREAK) ---
+function checkDailyLogin() {
+  const today = new Date().toDateString();
+
+  // 1. Ya se conectó hoy. No hacer nada.
+  if (state.player.lastLoginDate === today) {
+    return; 
+  }
+
+  const yesterday = new Date(Date.now() - 86400000).toDateString(); // 86400000ms = 24h
+  let baseReward = 20;
+
+  // 2. Es una racha (se conectó ayer)
+  if (state.player.lastLoginDate === yesterday) {
+    state.player.loginStreak++;
+  } 
+  // 3. Rompió la racha (no se conectó ni hoy ni ayer)
+  else {
+    state.player.loginStreak = 1;
+  }
+
+  // Actualizar la fecha de login
+  state.player.lastLoginDate = today;
+
+  // Calcular y dar recompensa
+  let finalReward = baseReward * state.player.loginStreak;
+  applyEffect({ credits: finalReward });
+
+  let rewardMsg = `¡Racha de conexión: Día ${state.player.loginStreak}! Ganas ${finalReward} Créditos.`;
+  if (state.player.loginStreak === 1) {
+     rewardMsg = `¡Bienvenido! Ganas ${finalReward} Créditos por tu conexión diaria.`;
+  }
+
+  state.player.diary.push(rewardMsg);
+  saveState();
+  // No necesitamos renderAll() aquí, porque se llamará después.
+}
 
   // --- INICIALIZACIÓN ---
   checkMimoReset(); 
@@ -2216,6 +2257,8 @@ function endMinigame() {
   renderTabs();
   renderTab("Player");
   renderAll(); 
+  checkDailyLogin(); // Comprobar la racha de conexión
+
 
   // --- Bucle de Fondo ---
   setInterval(() => {
