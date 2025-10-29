@@ -592,21 +592,89 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     "Epica": { xp: 1000, credits: 75, cooldownHours: 168 }
   };
   
-  const RANDOM_EVENTS = [
-    { text: "¡Encuentras 25 créditos en un bolsillo!", effect: { credits: 25 } },
-    { text: "Lees un artículo fascinante y ganas 15 XP.", effect: { xp: 15 } },
-    { text: "Duermes de maravilla y recuperas 20 HP.", effect: { hp: 20 } },
-    { text: "Te tropiezas y pierdes 5 HP. ¡Qué mala suerte!", effect: { hp: -5 } },
-    { text: "Ayudas a un anciano. ¡Karma! Ganas 10 XP.", effect: { xp: 10 } },
-    { text: "Recibes un cumplido inesperado. ¡Ganas 5 HP!", effect: { hp: 5 } },
-    { text: "Un pájaro te ensucia... Pierdes 2 créditos en limpieza.", effect: { credits: -2 } },
-    { text: "Resuelves un acertijo mental. Ganas 10 XP.", effect: { xp: 10 } },
-    { text: "Se te antoja un café caro. Pierdes 5 créditos.", effect: { credits: -5 } },
-    { text: "¡Día de suerte! No pasa nada, pero te sientes bien.", effect: {} },
-    // NUEVOS EVENTOS
-    { type: 'obstacle', text: "Sientes un bloqueo mental... ¡Un Obstáculo ha aparecido!", obstacle: "Procrastinación" },
-    { type: 'mission', text: "¡Un NPC te pide ayuda urgente!", mission: { title: "(EVENTO) Ayuda rápida", difficulty: "Facil", projectLink: null } }
-  ];
+  // --- LISTA DE EVENTOS (AHORA INTERACTIVOS) ---
+const RANDOM_EVENTS = [
+  // --- Evento 1 ---
+  { 
+    type: 'interactive',
+    text: "Caminando, ves un gatito asustado en un árbol. ¡No puede bajar!",
+    options: [
+      { stat: 'fue', text: "Intentar trepar al árbol por la fuerza." },
+      { stat: 'des', text: "Usar una escalera cercana con agilidad." },
+      { stat: 'int', text: "Trazar un plan para atraerlo con comida." },
+      { stat: 'car', text: "Calmar al gato con tu voz para que baje." }
+    ],
+    success_text: "¡Lo lograste! El dueño te ve y te da una recompensa.",
+    fail_text: "¡Fallaste! El gato te araña y huye.",
+    success_reward: { xp: 30, credits: 15 },
+    fail_penalty: { hp: -5 }
+  },
+  // --- Evento 2 ---
+  { 
+    type: 'interactive',
+    text: "Un mercader ambulante te ofrece un 'ítem misterioso' a un precio 'justo'.",
+    options: [
+      { stat: 'car', text: "Regatear el precio usando tu encanto." },
+      { stat: 'int', text: "Evaluar el ítem en busca de señales de estafa." },
+      { stat: 'des', text: "Intentar tomarlo y correr (¡arriesgado!)." },
+      { stat: 'fue', text: "Intimidar al mercader para que baje el precio." }
+    ],
+    success_text: "¡Funciona! El mercader cede y te lo da más barato.",
+    fail_text: "No funciona. El mercader se ofende y sube el precio.",
+    success_reward: { xp: 10, credits: -10 }, // Ganas XP pero pagas
+    fail_penalty: { credits: -25 } // Pagas más
+  },
+  // --- Evento 3 ---
+  { 
+    type: 'interactive',
+    text: "Ves un cofre viejo y cerrado en un callejón.",
+    options: [
+      { stat: 'fue', text: "Romper el candado a la fuerza." },
+      { stat: 'des', text: "Intentar forzar la cerradura con agilidad." },
+      { stat: 'int', text: "Examinar el cofre en busca de un mecanismo oculto." },
+      { stat: 'car', text: "Preguntar al dueño de la tienda cercana si sabe la combinación." }
+    ],
+    success_text: "¡Se abre! Dentro encuentras un pequeño tesoro.",
+    fail_text: "¡Haces mucho ruido! El candado no cede y tienes que irte.",
+    success_reward: { xp: 10, credits: 40 },
+    fail_penalty: { hp: 0 }
+  },
+  // --- Evento 4 ---
+  { 
+    type: 'interactive',
+    text: "Estás en una cafetería y dos personas discuten en la mesa de al lado. La situación es tensa.",
+    options: [
+      { stat: 'fue', text: "Ponerte en medio con autoridad para intimidarlos." },
+      { stat: 'des', text: "Derramar 'accidentalmente' un vaso de agua para distraerlos." },
+      { stat: 'int', text: "Analizar la discusión y proponer una solución lógica." },
+      { stat: 'car', text: "Intervenir amablemente y mediar en la conversación." }
+    ],
+    success_text: "Logras calmar la situación. El dueño te invita a un café.",
+    fail_text: "Empeoras las cosas. Te gritan y tienes que irte.",
+    success_reward: { xp: 25, hp: 5 },
+    fail_penalty: { hp: -5 }
+  },
+  // --- Evento 5 ---
+  { 
+    type: 'interactive',
+    text: "Un perro grande te bloquea el camino en un callejón, gruñendo.",
+    options: [
+      { stat: 'fue', text: "Plantarle cara y gritarle para asustarlo." },
+      { stat: 'des', text: "Esquivarlo rápidamente y saltar una valla cercana." },
+      { stat: 'int', text: "Quedarte quieto, evitando el contacto visual (comportamiento canino)." },
+      { stat: 'car', text: "Hablarle en tono calmado y suave para tranquilizarlo." }
+    ],
+    success_text: "El perro se relaja y te deja pasar, moviendo la cola.",
+    fail_text: "El perro se altera más y te muerde el tobillo.",
+    success_reward: { xp: 30 },
+    fail_penalty: { hp: -10 }
+  },
+
+  // --- Eventos Especiales (LOS MANTENEMOS) ---
+  { type: 'obstacle', text: "Sientes un bloqueo mental... ¡Un Obstáculo ha aparecido!", obstacle: "Procrastinación" },
+  { type: 'mission', text: "¡Un NPC te pide ayuda urgente!", mission: { title: "(EVENTO) Ayuda rápida", difficulty: "Facil", projectLink: null } }
+];
+
   
   const OBSTACLES = {
     "Procrastinación": { name: "Procrastinación", hp: 300, debuff: { type: 'xp_reduction', value: 0.25 }, description: "Efecto: -25% XP de todas las misiones." }
@@ -1443,45 +1511,114 @@ loginStreak: 0
   }
 
   // --- LÓGICA DE EVENTOS ALEATORIOS ---
-  function triggerRandomEvent() {
-    const COOLDOWN_MS = 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    const lastEvent = state.player.lastRandomEvent || 0;
-    if (now - lastEvent < COOLDOWN_MS) return;
+  // --- LÓGICA DE EVENTOS ALEATORIOS (¡AHORA CON PRUEBAS DE STAT!) ---
+function triggerRandomEvent() {
+  const COOLDOWN_MS = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const lastEvent = state.player.lastRandomEvent || 0;
+  if (now - lastEvent < COOLDOWN_MS) return;
 
-    state.player.lastRandomEvent = now;
-    const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
-    
-    state.player.diary.push(`(Evento) ${event.text}`);
-    
-    if (event.type === 'obstacle') {
-      const obstacleData = OBSTACLES[event.obstacle];
-      if (obstacleData && !state.player.activeObstacle) {
-        state.player.activeObstacle = JSON.parse(JSON.stringify(obstacleData)); // Clonar
-      }
-    } else if (event.type === 'mission') {
-      const nid = state.missions.length ? Math.max(...state.missions.map(x=>x.id)) + 1 : 1;
-      const defaultDiff = "Facil";
-      state.missions.push({ 
-        id: nid, 
-        title: event.mission.title, 
-        difficulty: event.mission.difficulty, 
-        status:"Pendiente", 
-        reward: DIFFICULTY_REWARDS[defaultDiff], 
-        cooldownHours: 0, // No se repite
-        completedAt: null,
-        projectLink: null
-      });
+  state.player.lastRandomEvent = now;
+  const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+
+  // --- CASO 1: Evento Interactivo (NUEVO) ---
+  if (event.type === 'interactive') {
+
+    // 1. Construir el mensaje de la mini-ventana
+    let promptMessage = `${event.text}\n\n¿Qué haces?\n`;
+    // CORRECCIÓN IMPORTANTE: Asegurarnos de que las opciones existan antes de leerlas
+    if (event.options && event.options.length >= 4) {
+      promptMessage += `1. ${event.options[0].text}\n`; // Opción 1
+      promptMessage += `2. ${event.options[1].text}\n`; // Opción 2
+      promptMessage += `3. ${event.options[2].text}\n`; // Opción 3
+      promptMessage += `4. ${event.options[3].text}\n`; // Opción 4
     } else {
-      applyEffect(event.effect);
+      // Si por error un evento no tiene 4 opciones, no se bloquea
+      console.error("Evento interactivo mal configurado:", event);
+      return; 
     }
-    
-    checkLevelUp();
-    checkAchievements(null, 'random_event'); 
-    saveState();
-    renderAll();
-    renderTab("Player");
+
+    // 2. Mostrar la "mini-ventana" (prompt)
+    const choice = prompt(promptMessage, "Escribe 1, 2, 3, o 4");
+    const choiceIndex = parseInt(choice) - 1; // Convertir "1" en 0, "2" en 1, etc.
+
+    // 3. Validar la elección
+    if (choiceIndex < 0 || choiceIndex > 3 || isNaN(choiceIndex)) {
+      alert("No te decidiste y la oportunidad pasó. ¡Más suerte la próxima!");
+      state.player.diary.push(`(Evento) Dudaste y la oportunidad pasó.`);
+      saveState();
+      renderAll();
+      renderTab("Player");
+      return;
+    }
+
+    // 4. Calcular el éxito
+    const chosenOption = event.options[choiceIndex];
+    const statKey = chosenOption.stat; // 'fue', 'int', 'des', o 'car'
+    const playerStatValue = state.player.attributes[statKey]; // p.ej. 10, 15, 20...
+
+    // --- CÁLCULO DE PROBABILIDAD ---
+    // Con 10 de stat (base) tienes un 30% de éxito.
+    // Con 20 de stat tienes un 60% de éxito.
+    // Con 30 de stat tienes un 90% de éxito.
+    // Aseguramos un mínimo de 5% y máximo de 95%
+    let successChance = (playerStatValue * 3) / 100; // p.ej. 10 * 3 = 30 -> 0.30
+    if (successChance < 0.05) successChance = 0.05;
+    if (successChance > 0.95) successChance = 0.95;
+
+    const roll = Math.random(); // Un número entre 0.0 y 1.0
+
+    if (roll < successChance) {
+      // ¡ÉXITO!
+      alert(`¡ÉXITO! (Stat: ${statKey.toUpperCase()} ${playerStatValue})\n\n${event.success_text}`);
+      state.player.diary.push(`(Evento) ¡Éxito! ${event.success_text}`);
+      applyEffect(event.success_reward);
+
+    } else {
+      // ¡FALLO!
+      alert(`¡FALLO! (Stat: ${statKey.toUpperCase()} ${playerStatValue})\n\n${event.fail_text}`);
+      state.player.diary.push(`(Evento) ¡Fallo! ${event.fail_text}`);
+      applyEffect(event.fail_penalty);
+    }
+
+  // --- CASO 2: Evento de Obstáculo (Antiguo) ---
+  } else if (event.type === 'obstacle') {
+    state.player.diary.push(`(Evento) ${event.text}`);
+    const obstacleData = OBSTACLES[event.obstacle];
+    if (obstacleData && !state.player.activeObstacle) {
+      state.player.activeObstacle = JSON.parse(JSON.stringify(obstacleData)); // Clonar
+    }
+
+  // --- CASO 3: Evento de Misión (Antiguo) ---
+  } else if (event.type === 'mission') {
+    state.player.diary.push(`(Evento) ${event.text}`);
+    const nid = state.missions.length ? Math.max(...state.missions.map(x=>x.id)) + 1 : 1;
+    const defaultDiff = "Facil";
+    state.missions.push({ 
+      id: nid, 
+      title: event.mission.title, 
+      difficulty: event.mission.difficulty, 
+      status:"Pendiente", 
+      reward: DIFFICULTY_REWARDS[defaultDiff], 
+      cooldownHours: 0, 
+      completedAt: null,
+      projectLink: null
+    });
+
+  // --- CASO 4: Evento simple (Por si queda alguno) ---
+  } else if (event.effect) {
+    state.player.diary.push(`(Evento) ${event.text}`);
+    applyEffect(event.effect);
   }
+
+  // 5. Finalizar
+  checkLevelUp();
+  checkAchievements(null, 'random_event'); // Mantenemos el logro de "usar evento"
+  saveState();
+  renderAll();
+  renderTab("Player");
+}
+
 
   // --- LÓGICA DE MISIONES Y NIVEL ---
   function checkMissionCooldowns() {
