@@ -443,13 +443,97 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       color: var(--muted);
     }
     @media (max-width: 800px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-      .achievements-list, .skills-container {
-        grid-template-columns: 1fr;
-      }
-    }
+  body {
+    padding: 10px; /* Menos padding en el body */
+  }
+  main {
+    grid-template-columns: 1fr; /* Coloca la barra lateral encima del contenido */
+  }
+  .card {
+    padding: 15px; /* Menos padding en las tarjetas */
+  }
+  header {
+    flex-direction: column; /* Apila el título y las pestañas */
+    gap: 15px;
+  }
+  .tabs {
+    justify-content: center; /* Centra las pestañas */
+  }
+  .tab {
+    padding: 6px 12px; /* Pestañas un poco más pequeñas */
+    font-size: 14px;
+  }
+
+  /* Botones más grandes y apilados */
+  .button {
+    width: 100%; /* Ocupan todo el ancho */
+    padding: 12px;
+    margin-top: 10px;
+    margin-right: 0;
+  }
+
+  /* Ajustes de tablas */
+  table input[type="text"] {
+    min-width: 200px; /* Inputs más pequeños en la tabla */
+  }
+
+  /* Apilar listas de 2 columnas */
+  .achievements-list, .skills-container {
+    grid-template-columns: 1fr;
+  }
+
+  /* Apilar botones del casino */
+  .casino-actions {
+    flex-direction: column;
+  }
+
+  /* Apilar sección de mimar gato */
+  .mimar-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Área del minijuego más pequeña */
+  #minigame-area {
+    height: 250px;
+  }
+}
+    /* --- CSS MINI-JUEGO --- */
+#minigame-container {
+  text-align: center;
+}
+#minigame-area {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: var(--bg);
+  border: 1px solid var(--card);
+  border-radius: var(--radius);
+  margin-top: 15px;
+  overflow: hidden;
+}
+#minigame-toy {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background-color: var(--stat-car);
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  font-size: 28px;
+  line-height: 50px;
+  text-align: center;
+  transition: all 0.1s;
+}
+#minigame-toy:hover {
+  transform: scale(1.1);
+}
+#minigame-status {
+  margin-top: 10px;
+  font-size: 18px;
+  color: var(--accent2);
+}
+
   </style>
 </head>
 <body>
@@ -686,7 +770,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   };
 
   // --- PESTAÑAS (TABS) ---
-  const TABS = ["Player", "Habilidades", "Compañero", "Missions", "Proyectos", "Inventario", "Store", "Casino", "Habits", "Achievements", "Configuración"];
+  const TABS = ["Player", "Habilidades", "Compañero", "Minijuego", "Missions", "Proyectos", "Inventario", "Store", "Casino", "Habits", "Achievements", "Configuración"];
   const tabsEl = document.getElementById("tabs");
   const contentEl = document.getElementById("tab-content");
   
@@ -1923,6 +2007,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (tab === "Player") renderPlayerTab();
     else if (tab === "Habilidades") renderHabilidadesTab();
     else if (tab === "Compañero") renderCompañeroTab();
+    else if (tab === "Minijuego") renderMinijuegoTab();
     else if (tab === "Missions") renderMissionsTab();
     else if (tab === "Proyectos") renderProyectosTab();
     else if (tab === "Inventario") renderInventarioTab();
@@ -1979,6 +2064,136 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     // 4. Widget de Obstáculo
     renderObstacleWidget();
   }
+// --- LÓGICA MINI-JUEGO ---
+let minigame = {
+  active: false,
+  clicksLeft: 0,
+  toyTimeout: null,
+  nextToyTimeout: null
+};
+
+function renderMinijuegoTab() {
+  const comp = state.player.companion;
+  const canPlay = comp.energy >= 10;
+
+  contentEl.innerHTML = `
+    <h2>🐭 Jugar con Michi</h2>
+    <div id="minigame-container">
+      <p style="color:var(--muted); margin-top: 4px;">¡Gasta 10 de Energía ⚡ para jugar con ${comp.name} y ganar recompensas!</p>
+
+      <button class="button" id="btn-start-minigame" ${canPlay ? '' : 'disabled'}>
+        ${canPlay ? 'Jugar (Cuesta 10 ⚡)' : 'Michi está cansado'}
+      </button>
+
+      <div id="minigame-status">¡Haz clic en el juguete 10 veces!</div>
+
+      <div id="minigame-area">
+        <div id="minigame-toy">🐭</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("btn-start-minigame").onclick = startMinigame;
+
+  // Si el juego está activo, no mostrar el botón de start
+  if (minigame.active) {
+    document.getElementById("btn-start-minigame").style.display = 'none';
+    document.getElementById("minigame-status").textContent = `¡Atrapa el juguete! Quedan ${minigame.clicksLeft} clics.`;
+  } else {
+    document.getElementById("minigame-status").style.display = 'none';
+  }
+}
+
+function startMinigame() {
+  if (state.player.companion.energy < 10 || minigame.active) return;
+
+  // Costo y estado
+  state.player.companion.energy -= 10;
+  minigame.active = true;
+  minigame.clicksLeft = 10;
+
+  // Actualizar UI
+  document.getElementById("btn-start-minigame").style.display = 'none';
+  const statusEl = document.getElementById("minigame-status");
+  statusEl.style.display = 'block';
+  statusEl.textContent = `¡Atrapa el juguete! Quedan ${minigame.clicksLeft} clics.`;
+
+  state.player.diary.push(`¡Empezaste a jugar con ${state.player.companion.name}!`);
+  saveState();
+  renderAll(); // Para actualizar la energía en el panel lateral si está visible
+
+  showMinigameToy();
+}
+
+function showMinigameToy() {
+  if (!minigame.active) return;
+
+  const area = document.getElementById("minigame-area");
+  const toy = document.getElementById("minigame-toy");
+
+  const areaRect = area.getBoundingClientRect();
+  const top = Math.random() * (areaRect.height - 50); // 50 es el alto del juguete
+  const left = Math.random() * (areaRect.width - 50);  // 50 es el ancho
+
+  toy.style.top = `${top}px`;
+  toy.style.left = `${left}px`;
+  toy.style.display = 'block';
+
+  toy.onclick = () => onToyClick();
+
+  // El juguete desaparece después de un tiempo
+  minigame.toyTimeout = setTimeout(() => {
+    hideMinigameToy();
+    minigame.nextToyTimeout = setTimeout(showMinigameToy, 300); // Siguiente juguete
+  }, 1200); // 1.2 segundos para hacer clic
+}
+
+function hideMinigameToy() {
+  document.getElementById("minigame-toy").style.display = 'none';
+  clearTimeout(minigame.toyTimeout);
+  clearTimeout(minigame.nextToyTimeout);
+}
+
+function onToyClick() {
+  if (!minigame.active) return;
+
+  minigame.clicksLeft--;
+  document.getElementById("minigame-status").textContent = `¡Atrapa el juguete! Quedan ${minigame.clicksLeft} clics.`;
+
+  hideMinigameToy();
+
+  if (minigame.clicksLeft <= 0) {
+    endMinigame();
+  } else {
+    // Siguiente juguete aparece rápido
+    minigame.nextToyTimeout = setTimeout(showMinigameToy, 250); // 0.25 segundos
+  }
+}
+
+function endMinigame() {
+  minigame.active = false;
+
+  applyEffect({ credits: 15, xp: 5 });
+  state.player.diary.push(`¡Juego terminado! Ganaste 15 Créditos y 5 XP.`);
+
+  // Actualizar UI
+  document.getElementById("minigame-status").textContent = '¡Ganaste! (+15 C, +5 XP)';
+  const startBtn = document.getElementById("btn-start-minigame");
+  startBtn.style.display = 'block';
+
+  // Revisar si puede volver a jugar
+  if (state.player.companion.energy < 10) {
+    startBtn.disabled = true;
+    startBtn.textContent = 'Michi está cansado';
+  } else {
+    startBtn.disabled = false;
+    startBtn.textContent = 'Jugar de nuevo (Cuesta 10 ⚡)';
+  }
+
+  checkLevelUp();
+  saveState();
+  renderAll();
+}
 
   // --- INICIALIZACIÓN ---
   checkMimoReset(); 
