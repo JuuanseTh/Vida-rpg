@@ -866,6 +866,8 @@ loginStreak: 0
   }
   
   let state = mergeDeep(JSON.parse(JSON.stringify(INITIAL)), savedState || {});
+  state.store = INITIAL.store; // ¡Forzar actualización de la Tienda!
+
   // Asegurar que campos añadidos después existen
   if (!state.casinoGame) state.casinoGame = INITIAL.casinoGame;
   if (!state.player.companion) state.player.companion = INITIAL.player.companion;
