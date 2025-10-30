@@ -2193,7 +2193,10 @@ if (Math.random() < lootChance) {
     else if (tab === "Habits") renderHabitsTab();
     else if (tab === "Configuración") renderConfiguracionTab();
     else if (tab === "Achievements") renderAchievementsTab();
-    else if (tab === "Leaderboard") renderLeaderboardTab();
+    else if (tab === "Leaderboard") {
+  alert("PRUEBA 1: ¡Clic en Leaderboard detectado!");
+  renderLeaderboardTab();
+}
   }
 
   // --- RENDER: Obstáculo ---
@@ -2457,6 +2460,7 @@ function updateLeaderboard(playerName, playerLevel) {
 
 // Función para LEER y RENDERIZAR la pestaña del Leaderboard
 function renderLeaderboardTab() {
+  alert("PRUEBA 2: ¡Función renderLeaderboardTab iniciada!");
   if (!db) {
      contentEl.innerHTML = `<h2>🏆 Leaderboard</h2><p style="color:var(--stat-fue);">Error: No se pudo conectar a la base de datos de Firebase.</p>`;
      return;
@@ -2517,6 +2521,7 @@ function renderLeaderboardTab() {
   </script>
 </body>
 </html>
+
 
 
 
