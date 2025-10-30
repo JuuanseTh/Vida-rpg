@@ -2,7 +2,23 @@
 <html lang="es">
 <head>
   <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+<script>
+  // --- INICIALIZACIÓN DE FIREBASE ---
+// ¡¡PEGA TU CÓDIGO 'firebaseConfig' DE FIREBASE AQUÍ!!
+const firebaseConfig = {
+   apiKey: "AIzaSyB-WpVyjAgZEHyfqZ9caHaS9vEQbpjSX8I",
+  authDomain: "vida-rpg-f2dbf.firebaseapp.com",
+  projectId: "vida-rpg-f2dbf",
+  storageBucket: "vida-rpg-f2dbf.firebasestorage.app",
+  messagingSenderId: "273885218531",
+  appId: "1:273885218531:web:41367ac017df3c15e667d6",
+  measurementId: "G-NL9EXH9GS3"
+};
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore(); // Esta es nuestra conexión a la base de datos
+// --- FIN DE INICIALIZACIÓN DE FIREBASE ---
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
@@ -535,6 +551,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 }
 
   </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
   <div class="container">
@@ -840,7 +858,7 @@ loginStreak: 0
   };
 
   // --- PESTAÑAS (TABS) ---
-  const TABS = ["Player", "Habilidades", "Compañero", "Minijuego", "Missions", "Proyectos", "Inventario", "Store", "Casino", "Habits", "Achievements", "Configuración"];
+  const TABS = ["Player", "Habilidades", "Compañero", "Minijuego", "Missions", "Proyectos", "Inventario", "Store", "Casino", "Habits", "Achievements", "Leaderboard", "Configuración"];
   const tabsEl = document.getElementById("tabs");
   const contentEl = document.getElementById("tab-content");
   
@@ -1821,6 +1839,8 @@ if (Math.random() < lootChance) {
       state.player.xptnl = Math.floor(state.player.xptnl * 1.5);
 
       state.player.diary.push(`¡SUBISTE AL NIVEL ${state.player.level}! Ganas 5 Puntos de Atributo (PA).`);
+      updateLeaderboard(state.player.name, state.player.level); // Enviar el nuevo nivel al Leaderboard
+    
       
       checkAchievements(); 
     }
@@ -2171,6 +2191,7 @@ if (Math.random() < lootChance) {
     else if (tab === "Habits") renderHabitsTab();
     else if (tab === "Configuración") renderConfiguracionTab();
     else if (tab === "Achievements") renderAchievementsTab();
+    else if (tab === "Leaderboard") renderLeaderboardTab();
   }
 
   // --- RENDER: Obstáculo ---
@@ -2410,10 +2431,89 @@ function checkDailyLogin() {
     if (tabActual === "Player") renderTab("Player"); 
     if (tabActual === "Compañero") renderTab("Compañero"); 
     if (tabActual === "Casino") renderTab("Casino"); 
-    
+   // --- LÓGICA DE LEADERBOARD (NUEVO) ---
+
+// Función para ENVIAR datos a Firebase
+function updateLeaderboard(playerName, playerLevel) {
+  if (!db) return; // No hacer nada si Firebase no se conectó
+
+  // Usamos el nombre del jugador como ID único.
+  // .set() crea el documento si no existe, o lo sobrescribe si ya existe.
+  db.collection("leaderboard").doc(playerName).set({
+    name: playerName,
+    level: playerLevel
+  })
+  .then(() => {
+    console.log("¡Puntuación actualizada en el Leaderboard!");
+  })
+  .catch((error) => {
+    console.error("Error al escribir en el Leaderboard: ", error);
+    // Opcional: registrar el error en el diario
+    // state.player.diary.push(`(Error de conexión con el Leaderboard)`);
+  });
+}
+
+// Función para LEER y RENDERIZAR la pestaña del Leaderboard
+function renderLeaderboardTab() {
+  if (!db) {
+     contentEl.innerHTML = `<h2>🏆 Leaderboard</h2><p style="color:var(--stat-fue);">Error: No se pudo conectar a la base de datos de Firebase.</p>`;
+     return;
+  }
+
+  let html = `<h2>🏆 Leaderboard (Top 10)</h2>
+    <p style="color:var(--muted); margin-top: 4px;">¡Compite con tus amigos!</p>
+    <button class="button" id="btn-refresh-leaderboard">Actualizar</button>
+    <div class="table-wrapper" style="margin-top: 15px;">
+      <table>
+        <thead><tr><th>Pos.</th><th>Nombre</th><th>Nivel</th></tr></thead>
+        <tbody id="leaderboard-list">
+          <tr><td colspan="3" style="text-align:center; color:var(--muted);">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+  contentEl.innerHTML = html;
+
+  // Listener para el botón de refrescar
+  document.getElementById("btn-refresh-leaderboard").onclick = () => renderLeaderboardTab();
+
+  // Pedir los datos a Firebase
+  db.collection("leaderboard")
+    .orderBy("level", "desc") // Ordenar por nivel (de mayor a menor)
+    .limit(10) // Traer solo los 10 primeros
+    .get()
+    .then((querySnapshot) => {
+      const listEl = document.getElementById("leaderboard-list");
+      listEl.innerHTML = ""; // Limpiar el "Cargando..."
+
+      if (querySnapshot.empty) {
+        listEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted);">El leaderboard está vacío. ¡Sé el primero en subir de nivel!</td></tr>`;
+        return;
+      }
+
+      let position = 1;
+      querySnapshot.forEach((doc) => {
+        const player = doc.data();
+        listEl.innerHTML += `
+          <tr>
+            <td><b>#${position}</b></td>
+            <td>${escapeHtml(player.name)}</td>
+            <td><b>${player.level}</b></td>
+          </tr>
+        `;
+        position++;
+      });
+    })
+    .catch((error) => {
+      console.error("Error al leer el Leaderboard: ", error);
+      const listEl = document.getElementById("leaderboard-list");
+      listEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--stat-fue);">Error al cargar los datos. Intenta de nuevo.</td></tr>`;
+    });
+} 
   }, 30000); 
   
   </script>
 </body>
 </html>
+
 
