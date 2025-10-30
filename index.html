@@ -3,27 +3,14 @@
 <head>
   <!-- Google Tag Manager -->
 <script>
-  // --- INICIALIZACIÓN DE FIREBASE ---
-// ¡¡PEGA TU CÓDIGO 'firebaseConfig' DE FIREBASE AQUÍ!!
-const firebaseConfig = {
-   apiKey: "AIzaSyB-WpVyjAgZEHyfqZ9caHaS9vEQbpjSX8I",
-  authDomain: "vida-rpg-f2dbf.firebaseapp.com",
-  projectId: "vida-rpg-f2dbf",
-  storageBucket: "vida-rpg-f2dbf.firebasestorage.app",
-  messagingSenderId: "273885218531",
-  appId: "1:273885218531:web:41367ac017df3c15e667d6",
-  measurementId: "G-NL9EXH9GS3"
-};
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore(); // Esta es nuestra conexión a la base de datos
-// --- FIN DE INICIALIZACIÓN DE FIREBASE ---
   (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-MCPMM9QB');</script>
 <!-- End Google Tag Manager -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vida RPG — Visual</title>
@@ -602,6 +589,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 
   <script>
+     // --- INICIALIZACIÓN DE FIREBASE ---
+// ¡¡PEGA TU CÓDIGO 'firebaseConfig' DE FIREBASE AQUÍ!!
+const firebaseConfig = {
+   apiKey: "AIzaSyB-WpVyjAgZEHyfqZ9caHaS9vEQbpjSX8I",
+  authDomain: "vida-rpg-f2dbf.firebaseapp.com",
+  projectId: "vida-rpg-f2dbf",
+  storageBucket: "vida-rpg-f2dbf.firebasestorage.app",
+  messagingSenderId: "273885218531",
+  appId: "1:273885218531:web:41367ac017df3c15e667d6",
+  measurementId: "G-NL9EXH9GS3"
+};
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore(); // Esta es nuestra conexión a la base de datos
+// --- FIN DE INICIALIZACIÓN DE FIREBASE ---
   // --- CONFIGURACIÓN ---
   const DIFFICULTY_REWARDS = {
     "Facil": { xp: 50, credits: 10, cooldownHours: 8 },
@@ -2515,5 +2517,6 @@ function renderLeaderboardTab() {
   </script>
 </body>
 </html>
+
 
 
