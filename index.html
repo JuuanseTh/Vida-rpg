@@ -2141,145 +2141,26 @@ applyEffect(projectReward);
     if (eventType === 'fail_habit' && state.player.totalHabitsFailed >= 1) unlockAchievement(14); // Oculto
   }
 
-    function renderConfiguracionTab() {
-  // Lista de Temas y sus precios en Gemas
-  const THEME_PRICES = {
-    "theme-light": 3,
-    "theme-forest": 3
-  };
+    // --- CÓDIGO TEMPORAL SEGURO (REPARACIÓN) ---
 
-  const THEME_NAMES = {
-    "theme-light": "Tema Claro",
-    "theme-forest": "Tema Bosque"
-  };
+// Lista de Nombres de Temas (vacía por ahora)
+const THEME_NAMES = {};
 
-  let html = `<h2>⚙️ Configuración</h2>
-
-    <div style="margin-top: 15px;">
-      <label>🎨 Tienda de Temas (Skins)</label>
-      <p style="color:var(--muted); font-size: 14px;">Ganas Gemas 💎 al derrotar Obstáculos y completar Proyectos.</p>
-      <div class="habits-list"> `;
-
-  // Botón para el Tema Oscuro (por defecto)
-  html += `
-    <div class="habit-card">
-      <div class="habit-details">
-        <h3>Tema Oscuro (Gratis)</h3>
-      </div>
-      <div class="habit-controls">
-        ${state.system.activeTheme === "" ? '<span>✅ Activado</span>' : '<button class="button" onclick="applyTheme(\'\')">Activar</button>'}
-      </div>
-    </div>
-  `;
-
-  // Botones para los Temas de pago
-  for (const themeKey in THEME_PRICES) {
-    const price = THEME_PRICES[themeKey];
-    const themeName = THEME_NAMES[themeKey];
-    const isUnlocked = state.system.unlockedThemes[themeKey];
-    const isActive = state.system.activeTheme === themeKey;
-
-    let buttonHtml = '';
-    if (isActive) {
-      buttonHtml = '<span>✅ Activado</span>';
-    } else if (isUnlocked) {
-      buttonHtml = `<button class="button" onclick="applyTheme('${themeKey}')">Activar</button>`;
-    } else {
-      // No está desbloqueado -> Botón de compra
-      const canBuy = state.player.gemas >= price;
-      buttonHtml = `<button class="button" onclick="buyTheme('${themeKey}', ${price})" ${canBuy ? '' : 'disabled'}>
-                      Comprar ( ${price} 💎 )
-                    </button>`;
-    }
-
-    html += `
-      <div class="habit-card">
-        <div class="habit-details">
-          <h3>${themeName}</h3>
-        </div>
-        <div class="habit-controls">
-          ${buttonHtml}
-        </div>
-      </div>
-    `;
-  }
-
-  html += `</div></div><hr style="border:1px solid var(--card); margin: 20px 0;">`;
-
-  // --- Opciones de Admin y Borrado (las que ya tenías) ---
-  html += `
-    <div style="margin-top: 15px;">
-      <label>Modo Administrador (Editar dificultad de misión)</label>
-      <button class="button" id="btn-admin-mode" style="background: ${state.system.adminMode ? 'var(--stat-des)' : 'var(--stat-fue)'};">
-        ${state.system.adminMode ? 'Activado' : 'Desactivado'}
-      </button>
-    </div>
-
-    <div style="margin-top: 15px;">
-      <label>Forzar reseteo de contadores de hábitos y mimos</label>
-      <button class="button" id="btn-reset-habits" style="background: var(--accent2);">Resetear Contadores</button>
-    </div>
-
-    <hr style="border:1px solid var(--card); margin: 20px 0;">
-
-    <div style="margin-top: 15px;">
-      <label style="color: var(--stat-fue); font-weight: bold;">Zona de Peligro</label>
-      <button class="button" id="btn-wipe-save" style="background: var(--stat-fue);">BORRAR PARTIDA</button>
-    </div>
-  `;
-  contentEl.innerHTML = html;
-
-  // --- RE-ASIGNAR LISTENERS ---
-  document.getElementById('btn-admin-mode').onclick = () => {
-    state.system.adminMode = !state.system.adminMode;
-    saveState();
-    renderTab("Configuración");
-  };
-
-  document.getElementById('btn-reset-habits').onclick = () => {
-    state.habits.forEach(h => h.countToday = 0);
-    state.system.lastHabitReset = new Date().toDateString();
-    state.player.companion.mimosToday = 0; 
-    state.player.companion.lastMimoReset = new Date().toDateString();
-    saveState();
-    renderTab("Configuración");
-    renderTab("Player"); // Refrescar mimos en Player
-  };
-
-  document.getElementById('btn-wipe-save').onclick = () => {
-    if (confirm("¿ESTÁS SEGURO?\n\Esta acción es irreversible y borrará todo tu progreso.")) {
-      localStorage.clear();
-      location.reload();
-    }
-  };
+// Función de Configuración (versión segura)
+function renderConfiguracionTab() {
+  contentEl.innerHTML = `<h2>⚙️ Configuración</h2><p style="color:var(--stat-fue);">¡Función en mantenimiento! Reparando un error.</p>`;
 }
 
-// --- LÓGICA DE TEMAS (SKINS) ---
-// (Esta es la función que ya tenías, la dejamos igual)
+// Función de Tema (vacía)
 function applyTheme(themeName) {
-  document.body.className = themeName;
-  state.system.activeTheme = themeName;
-  saveState();
-  renderTab("Configuración"); // Refrescar la pestaña para mostrar el botón "Activado"
+  // (vacío por ahora)
 }
 
-// ¡NUEVA FUNCIÓN PARA COMPRAR!
+// Función de Compra (vacía)
 function buyTheme(themeKey, price) {
-  if (state.player.gemas >= price) {
-    state.player.gemas -= price;
-    state.system.unlockedThemes[themeKey] = true;
-
-    state.player.diary.push(`¡Compraste el "${THEME_NAMES[themeKey] || themeKey}"!`);
-
-    applyTheme(themeKey); // Activar el tema recién comprado
-    renderAll(); // Actualizar el contador de Gemas
-  } else {
-    alert("¡No tienes suficientes Gemas 💎 para comprar este tema!");
-  }
+  // (vacío por ahora)
 }
-// --- FIN LÓGICA DE TEMAS ---
-
-  // --- RENDER: Función de Pestaña Principal ---
+// --- FIN DEL CÓDIGO SEGURO ---
   function renderTab(tab) {
     if (tab === "Player") renderPlayerTab();
     else if (tab === "Habilidades") renderHabilidadesTab();
@@ -2707,6 +2588,7 @@ function renderLeaderboardTab() {
   </script>
 </body>
 </html>
+
 
 
 
