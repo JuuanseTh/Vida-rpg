@@ -744,6 +744,7 @@ const RANDOM_EVENTS = [
       equipment: { amulet: null, tool: null, book: null },
       inventory: [],
       activeObstacle: null,
+      gemas: 0, // <-- NUEVA MONEDA
       // --- COMPAÑERO ---
       companion: {
         name: "Michi",
@@ -830,6 +831,10 @@ loginStreak: 0
     system: {
       lastHabitReset: new Date().toDateString(),
       adminMode: true 
+      unlockedThemes: {
+  "theme-light": false,
+  "theme-forest": false
+},
     },
     // --- LISTA COMPLETA DE 15 LOGROS ---
     achievements: [
@@ -888,6 +893,7 @@ loginStreak: 0
   let state = mergeDeep(JSON.parse(JSON.stringify(INITIAL)), savedState || {});
   state.store = INITIAL.store; // ¡Forzar actualización de la Tienda!
     state.achievements = INITIAL.achievements; // ¡Forzar actualización de Logros!
+    if (!state.system.unlockedThemes) state.system.unlockedThemes = INITIAL.system.unlockedThemes; // Forzar Skins
 
   // Asegurar que campos añadidos después existen
   if (!state.casinoGame) state.casinoGame = INITIAL.casinoGame;
@@ -967,6 +973,9 @@ loginStreak: 0
     if (effect.attributePoints) {
       state.player.attributePoints += effect.attributePoints;
     }
+    if (effect.gemas) {
+  state.player.gemas = (state.player.gemas || 0) + effect.gemas;
+}
     // Efectos de Compañero
     if (effect.companion_energy) {
       state.player.companion.energy += effect.companion_energy;
@@ -1802,7 +1811,7 @@ if (Math.random() < lootChance) {
       if (state.player.activeObstacle.hp <= 0) {
         state.player.diary.push(`¡Has derrotado al Obstáculo: "${state.player.activeObstacle.name}"!`);
         state.player.activeObstacle = null;
-        applyEffect({ xp: 100, credits: 50 }); // Recompensa por derrotarlo
+        applyEffect({ xp: 100, credits: 50, gemas: 1 }); // Recompensa por derrotarlo
         checkAchievements(null, 'obstacle_defeated'); 
       }
     }
@@ -1817,7 +1826,9 @@ if (Math.random() < lootChance) {
         // Comprobar si se completó el proyecto
         if (project.currentPoints >= project.totalPoints) {
           state.player.diary.push(`¡PROYECTO COMPLETADO: "${project.title}"!`);
-          applyEffect(project.reward);
+          let projectReward = JSON.parse(JSON.stringify(project.reward)); // Clonar recompensa
+projectReward.gemas = 1; // Añadir 1 Gema
+applyEffect(projectReward);
           checkAchievements(null, 'project_completed'); 
         }
       }
@@ -2132,53 +2143,143 @@ if (Math.random() < lootChance) {
   
   // --- RENDER: Pestaña Configuración ---
   function renderConfiguracionTab() {
-    let html = `<h2>⚙️ Configuración</h2>
-      
-      <div style="margin-top: 15px;">
-        <label>Modo Administrador (Editar dificultad de misión)</label>
-        <button class="button" id="btn-admin-mode" style="background: ${state.system.adminMode ? 'var(--stat-des)' : 'var(--stat-fue)'};">
-          ${state.system.adminMode ? 'Activado' : 'Desactivado'}
-        </button>
+    function renderConfiguracionTab() {
+  // Lista de Temas y sus precios en Gemas
+  const THEME_PRICES = {
+    "theme-light": 3,
+    "theme-forest": 3
+  };
+
+  const THEME_NAMES = {
+    "theme-light": "Tema Claro",
+    "theme-forest": "Tema Bosque"
+  };
+
+  let html = `<h2>⚙️ Configuración</h2>
+
+    <div style="margin-top: 15px;">
+      <label>🎨 Tienda de Temas (Skins)</label>
+      <p style="color:var(--muted); font-size: 14px;">Ganas Gemas 💎 al derrotar Obstáculos y completar Proyectos.</p>
+      <div class="habits-list"> `;
+
+  // Botón para el Tema Oscuro (por defecto)
+  html += `
+    <div class="habit-card">
+      <div class="habit-details">
+        <h3>Tema Oscuro (Gratis)</h3>
       </div>
-      
-      <div style="margin-top: 15px;">
-        <label>Forzar reseteo de contadores de hábitos y mimos</label>
-        <button class="button" id="btn-reset-habits" style="background: var(--accent2);">Resetear Contadores</button>
+      <div class="habit-controls">
+        ${state.system.activeTheme === "" ? '<span>✅ Activado</span>' : '<button class="button" onclick="applyTheme(\'\')">Activar</button>'}
       </div>
-      
-      <hr style="border:1px solid var(--card); margin: 20px 0;">
-      
-      <div style="margin-top: 15px;">
-        <label style="color: var(--stat-fue); font-weight: bold;">Zona de Peligro</label>
-        <button class="button" id="btn-wipe-save" style="background: var(--stat-fue);">BORRAR PARTIDA</button>
+    </div>
+  `;
+
+  // Botones para los Temas de pago
+  for (const themeKey in THEME_PRICES) {
+    const price = THEME_PRICES[themeKey];
+    const themeName = THEME_NAMES[themeKey];
+    const isUnlocked = state.system.unlockedThemes[themeKey];
+    const isActive = state.system.activeTheme === themeKey;
+
+    let buttonHtml = '';
+    if (isActive) {
+      buttonHtml = '<span>✅ Activado</span>';
+    } else if (isUnlocked) {
+      buttonHtml = `<button class="button" onclick="applyTheme('${themeKey}')">Activar</button>`;
+    } else {
+      // No está desbloqueado -> Botón de compra
+      const canBuy = state.player.gemas >= price;
+      buttonHtml = `<button class="button" onclick="buyTheme('${themeKey}', ${price})" ${canBuy ? '' : 'disabled'}>
+                      Comprar ( ${price} 💎 )
+                    </button>`;
+    }
+
+    html += `
+      <div class="habit-card">
+        <div class="habit-details">
+          <h3>${themeName}</h3>
+        </div>
+        <div class="habit-controls">
+          ${buttonHtml}
+        </div>
       </div>
     `;
-    contentEl.innerHTML = html;
-    
-    // Listeners
-    document.getElementById('btn-admin-mode').onclick = () => {
-      state.system.adminMode = !state.system.adminMode;
-      saveState();
-      renderTab("Configuración");
-    };
-    
-    document.getElementById('btn-reset-habits').onclick = () => {
-      state.habits.forEach(h => h.countToday = 0);
-      state.system.lastHabitReset = new Date().toDateString();
-      state.player.companion.mimosToday = 0; 
-      state.player.companion.lastMimoReset = new Date().toDateString();
-      saveState();
-      renderTab("Configuración");
-      renderTab("Player"); // Refrescar mimos en Player
-    };
-    
-    document.getElementById('btn-wipe-save').onclick = () => {
-      if (confirm("¿ESTÁS SEGURO?\n\nEsto borrará todo tu progreso permanentemente. No se puede deshacer.")) {
-        localStorage.clear();
-        location.reload();
-      }
-    };
   }
+
+  html += `</div></div><hr style="border:1px solid var(--card); margin: 20px 0;">`;
+
+  // --- Opciones de Admin y Borrado (las que ya tenías) ---
+  html += `
+    <div style="margin-top: 15px;">
+      <label>Modo Administrador (Editar dificultad de misión)</label>
+      <button class="button" id="btn-admin-mode" style="background: ${state.system.adminMode ? 'var(--stat-des)' : 'var(--stat-fue)'};">
+        ${state.system.adminMode ? 'Activado' : 'Desactivado'}
+      </button>
+    </div>
+
+    <div style="margin-top: 15px;">
+      <label>Forzar reseteo de contadores de hábitos y mimos</label>
+      <button class="button" id="btn-reset-habits" style="background: var(--accent2);">Resetear Contadores</button>
+    </div>
+
+    <hr style="border:1px solid var(--card); margin: 20px 0;">
+
+    <div style="margin-top: 15px;">
+      <label style="color: var(--stat-fue); font-weight: bold;">Zona de Peligro</label>
+      <button class="button" id="btn-wipe-save" style="background: var(--stat-fue);">BORRAR PARTIDA</button>
+    </div>
+  `;
+  contentEl.innerHTML = html;
+
+  // --- RE-ASIGNAR LISTENERS ---
+  document.getElementById('btn-admin-mode').onclick = () => {
+    state.system.adminMode = !state.system.adminMode;
+    saveState();
+    renderTab("Configuración");
+  };
+
+  document.getElementById('btn-reset-habits').onclick = () => {
+    state.habits.forEach(h => h.countToday = 0);
+    state.system.lastHabitReset = new Date().toDateString();
+    state.player.companion.mimosToday = 0; 
+    state.player.companion.lastMimoReset = new Date().toDateString();
+    saveState();
+    renderTab("Configuración");
+    renderTab("Player"); // Refrescar mimos en Player
+  };
+
+  document.getElementById('btn-wipe-save').onclick = () => {
+    if (confirm("¿ESTÁS SEGURO?\n\Esta acción es irreversible y borrará todo tu progreso.")) {
+      localStorage.clear();
+      location.reload();
+    }
+  };
+}
+
+// --- LÓGICA DE TEMAS (SKINS) ---
+// (Esta es la función que ya tenías, la dejamos igual)
+function applyTheme(themeName) {
+  document.body.className = themeName;
+  state.system.activeTheme = themeName;
+  saveState();
+  renderTab("Configuración"); // Refrescar la pestaña para mostrar el botón "Activado"
+}
+
+// ¡NUEVA FUNCIÓN PARA COMPRAR!
+function buyTheme(themeKey, price) {
+  if (state.player.gemas >= price) {
+    state.player.gemas -= price;
+    state.system.unlockedThemes[themeKey] = true;
+
+    state.player.diary.push(`¡Compraste el "${THEME_NAMES[themeKey] || themeKey}"!`);
+
+    applyTheme(themeKey); // Activar el tema recién comprado
+    renderAll(); // Actualizar el contador de Gemas
+  } else {
+    alert("¡No tienes suficientes Gemas 💎 para comprar este tema!");
+  }
+}
+// --- FIN LÓGICA DE TEMAS ---
 
   // --- RENDER: Función de Pestaña Principal ---
   function renderTab(tab) {
@@ -2225,6 +2326,17 @@ if (Math.random() < lootChance) {
     document.getElementById("player-level").textContent = state.player.level;
     document.getElementById("player-credits").textContent = state.player.credits;
     document.getElementById("player-pa").textContent = state.player.attributePoints;
+    // Mostrar Gemas (Nueva Moneda)
+if (!document.getElementById("player-gemas")) {
+  const paStat = document.getElementById("player-pa").closest('.stat');
+  paStat.insertAdjacentHTML('afterend', `
+    <div class="stat">
+      <label>💎 Gemas</label>
+      <div class="value" id="player-gemas" style="color: #00bcd4;">0</div>
+    </div>
+  `);
+}
+document.getElementById("player-gemas").textContent = state.player.gemas || 0;
     
     const currentHp = state.player.hp || 0;
     const maxHp = state.player.maxHp || 100;
@@ -2597,6 +2709,7 @@ function renderLeaderboardTab() {
   </script>
 </body>
 </html>
+
 
 
 
