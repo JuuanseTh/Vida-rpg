@@ -756,7 +756,7 @@ const RANDOM_EVENTS = [
         expeditionEnds: null,
         mimosToday: 0, 
         lastMimoReset: new Date().toDateString() 
-      },// --- DATOS DE LOGIN ---
+      }, // --- DATOS DE LOGIN ---
 lastLoginDate: null,
 loginStreak: 0
     },
@@ -830,7 +830,7 @@ loginStreak: 0
     ],
     system: {
       lastHabitReset: new Date().toDateString(),
-      adminMode: true 
+      adminMode: true,
       unlockedThemes: {
   "theme-light": false,
   "theme-forest": false
@@ -2504,90 +2504,13 @@ function renderLeaderboardTab() {
     if (tabActual === "Player") renderTab("Player"); 
     if (tabActual === "Compañero") renderTab("Compañero"); 
     if (tabActual === "Casino") renderTab("Casino"); 
-   // --- LÓGICA DE LEADERBOARD (NUEVO) ---
-
-// Función para ENVIAR datos a Firebase
-function updateLeaderboard(playerName, playerLevel) {
-  if (!db) return; // No hacer nada si Firebase no se conectó
-
-  // Usamos el nombre del jugador como ID único.
-  // .set() crea el documento si no existe, o lo sobrescribe si ya existe.
-  db.collection("leaderboard").doc(playerName).set({
-    name: playerName,
-    level: playerLevel
-  })
-  .then(() => {
-    console.log("¡Puntuación actualizada en el Leaderboard!");
-  })
-  .catch((error) => {
-    console.error("Error al escribir en el Leaderboard: ", error);
-    // Opcional: registrar el error en el diario
-    // state.player.diary.push(`(Error de conexión con el Leaderboard)`);
-  });
-}
-
-// Función para LEER y RENDERIZAR la pestaña del Leaderboard
-function renderLeaderboardTab() {
-  if (!db) {
-     contentEl.innerHTML = `<h2>🏆 Leaderboard</h2><p style="color:var(--stat-fue);">Error: No se pudo conectar a la base de datos de Firebase.</p>`;
-     return;
-  }
-
-  let html = `<h2>🏆 Leaderboard (Top 10)</h2>
-    <p style="color:var(--muted); margin-top: 4px;">¡Compite con tus amigos!</p>
-    <button class="button" id="btn-refresh-leaderboard">Actualizar</button>
-    <div class="table-wrapper" style="margin-top: 15px;">
-      <table>
-        <thead><tr><th>Pos.</th><th>Nombre</th><th>Nivel</th></tr></thead>
-        <tbody id="leaderboard-list">
-          <tr><td colspan="3" style="text-align:center; color:var(--muted);">Cargando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  `;
-  contentEl.innerHTML = html;
-
-  // Listener para el botón de refrescar
-  document.getElementById("btn-refresh-leaderboard").onclick = () => renderLeaderboardTab();
-
-  // Pedir los datos a Firebase
-  db.collection("leaderboard")
-    .orderBy("level", "desc") // Ordenar por nivel (de mayor a menor)
-    .limit(10) // Traer solo los 10 primeros
-    .get()
-    .then((querySnapshot) => {
-      const listEl = document.getElementById("leaderboard-list");
-      listEl.innerHTML = ""; // Limpiar el "Cargando..."
-
-      if (querySnapshot.empty) {
-        listEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted);">El leaderboard está vacío. ¡Sé el primero en subir de nivel!</td></tr>`;
-        return;
-      }
-
-      let position = 1;
-      querySnapshot.forEach((doc) => {
-        const player = doc.data();
-        listEl.innerHTML += `
-          <tr>
-            <td><b>#${position}</b></td>
-            <td>${escapeHtml(player.name)}</td>
-            <td><b>${player.level}</b></td>
-          </tr>
-        `;
-        position++;
-      });
-    })
-    .catch((error) => {
-      console.error("Error al leer el Leaderboard: ", error);
-      const listEl = document.getElementById("leaderboard-list");
-      listEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--stat-fue);">Error al cargar los datos. Intenta de nuevo.</td></tr>`;
-    });
-} 
+    
   }, 30000); 
   
   </script>
 </body>
 </html>
+
 
 
 
