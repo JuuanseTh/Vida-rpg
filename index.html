@@ -887,6 +887,7 @@ loginStreak: 0
   
   let state = mergeDeep(JSON.parse(JSON.stringify(INITIAL)), savedState || {});
   state.store = INITIAL.store; // ¡Forzar actualización de la Tienda!
+    state.achievements = INITIAL.achievements; // ¡Forzar actualización de Logros!
 
   // Asegurar que campos añadidos después existen
   if (!state.casinoGame) state.casinoGame = INITIAL.casinoGame;
@@ -2121,7 +2122,7 @@ if (Math.random() < lootChance) {
     // Por evento
     if (eventType === 'buy_item') unlockAchievement(7);
     if (eventType === 'equip') unlockAchievement(8);
-    if (eventType === 'spend_pa' && state.player.attributePoints < INITIAL.player.attributePoints) unlockAchievement(9);
+    if (eventType === 'spend_pa') unlockAchievement(9);
     if (eventType === 'buy_skill') unlockAchievement(10);
     if (eventType === 'obstacle_defeated') unlockAchievement(11); // Oculto
     if (eventType === 'project_completed') unlockAchievement(12); // Oculto
@@ -2596,6 +2597,7 @@ function renderLeaderboardTab() {
   </script>
 </body>
 </html>
+
 
 
 
