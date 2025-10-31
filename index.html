@@ -2140,7 +2140,8 @@ applyEffect(projectReward);
     if (eventType === 'random_event') unlockAchievement(13); // Oculto
     if (eventType === 'fail_habit' && state.player.totalHabitsFailed >= 1) unlockAchievement(14); // Oculto
   }
-  
+
+    function renderConfiguracionTab() {
   // Lista de Temas y sus precios en Gemas
   const THEME_PRICES = {
     "theme-light": 3,
@@ -2706,6 +2707,7 @@ function renderLeaderboardTab() {
   </script>
 </body>
 </html>
+
 
 
 
