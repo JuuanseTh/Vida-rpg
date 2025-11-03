@@ -1128,3 +1128,45 @@ footer {
 .animate-flash {
   animation: card-flash 1.2s ease-in-out;
 }
+/* --- Animaciones de Combate --- */
+@keyframes player-lunge {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(60px, -30px) scale(1.1); }
+  100% { transform: translate(0, 0); }
+}
+/* Clase para aplicar la animación */
+.animate-player-lunge {
+  animation: player-lunge 0.5s ease-in-out;
+}
+
+@keyframes enemy-lunge {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-60px, 30px) scale(1.1); }
+  100% { transform: translate(0, 0); }
+}
+/* Clase para aplicar la animación */
+.animate-enemy-lunge {
+  animation: enemy-lunge 0.5s ease-in-out;
+}
+
+@keyframes sprite-hit-shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-8px) rotate(-2deg); opacity: 0.8; }
+  50% { transform: translateX(8px) rotate(2deg); }
+  75% { transform: translateX(-8px) rotate(-2deg); opacity: 0.8; }
+  100% { transform: translateX(0); }
+}
+/* Clase para aplicar la animación */
+.animate-hit-shake {
+  animation: sprite-hit-shake 0.4s linear;
+}
+
+@keyframes sprite-heal-pulse {
+  0% { filter: brightness(1) drop-shadow(0 0 0 var(--stat-des)); }
+  50% { filter: brightness(1.5) drop-shadow(0 0 15px var(--stat-des)); transform: scale(1.1); }
+  100% { filter: brightness(1) drop-shadow(0 0 0 var(--stat-des)); }
+}
+/* Clase para aplicar la animación */
+.animate-heal-pulse {
+  animation: sprite-heal-pulse 0.6s ease-in-out;
+}
