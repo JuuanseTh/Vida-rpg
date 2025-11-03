@@ -739,7 +739,7 @@ const firebaseConfig = {
   measurementId: "G-NL9EXH9GS3"
 };
 // Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
+firebase.izeApp(firebaseConfig);
 const db = firebase.firestore(); // Esta es nuestra conexión a la base de datos
 // --- FIN DE INICIALIZACIÓN DE FIREBASE ---
   // --- CONFIGURACIÓN ---
@@ -862,44 +862,47 @@ const RANDOM_EVENTS = [
   };
 
   // --- DATOS INICIALES ---
-  const INITIAL = {
-    player: {
-      name: "Player",
-      level: 1,
-      hp: 100,
-      maxHp: 100, 
-      xp: 0,
-      xptnl: 100,
-      credits: 0,
-      diary: ["¡Tu aventura comienza!"],
-      totalMissionsDone: 0,
-      totalHabitsFailed: 0, 
-      lastRandomEvent: null,
-      lastCasinoVisit: null, 
-      attributePoints: 0,
-      attributes: { fue: 10, int: 10, des: 10, car: 10 },
-      skills: { f1: false, i1: false, d1: false, c1: false },
-      equipment: { amulet: null, tool: null, book: null },
-      inventory: [],
-      activeObstacle: null,
-      gemas: 0, // <-- NUEVA MONEDA
-      // --- COMPAÑERO ---
-      companion: {
-        name: "Michi",
-        rarity: "Común",
-        color: "Gris",
-        energy: 100,
-        maxEnergy: 100,
-        onExpedition: false,
-        expeditionEnds: null,
-        mimosToday: 0, 
-        lastMimoReset: new Date().toDateString() 
-      }, 
-      // --- DATOS DE LOGIN ---
-lastLoginDate: null,
-loginStreak: 0,
-      lastBossWin: null, 
-    },
+  const  = {
+   player: {
+  name: "Player",
+  level: 1,
+  hp: 100,
+  maxHp: 100, 
+  xp: 0,
+  xptnl: 100,
+  credits: 0,
+  diary: ["¡Tu aventura comienza!"],
+  totalMissionsDone: 0,
+  totalHabitsFailed: 0, 
+  lastRandomEvent: null,
+  lastCasinoVisit: null, 
+  attributePoints: 0,
+  attributes: { fue: 10, int: 10, des: 10, car: 10 },
+  skills: { f1: false, i1: false, d1: false, c1: false },
+  equipment: { amulet: null, tool: null, book: null },
+  inventory: [],
+  activeObstacle: null,
+  gemas: 0, // <-- NUEVA MONEDA
+
+  // --- COMPAÑERO ---
+  companion: {
+    name: "Michi",
+    rarity: "Común",
+    color: "Gris",
+    energy: 100,
+    maxEnergy: 100,
+    onExpedition: false,
+    expeditionEnds: null,
+    mimosToday: 0, 
+    lastMimoReset: new Date().toDateString() 
+  }, // <-- ¡¡COMA ARREGLADA!!
+
+  // --- DATOS DE LOGIN ---
+  lastLoginDate: null,
+  loginStreak: 0, // <-- ¡¡COMA ARREGLADA!!
+  lastBossWin: null
+
+}, // <-- Esta es la llave de cierre de 'player'
     // --- LISTA COMPLETA DE 40 MISIONES ---
     missions: [
       // Guerrero (10) - Proyecto 1
@@ -3277,6 +3280,7 @@ if (tabActual === "Casino") renderTab("Casino");
 </div>
 </body>
 </html>
+
 
 
 
