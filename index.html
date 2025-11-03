@@ -1117,8 +1117,17 @@ loginStreak: 0
     if (effect.gemas) {
   state.player.gemas = (state.player.gemas || 0) + effect.gemas;
 }
-    
-    // --- INICIO: LÓGICA DE COMBATE POKÉMON ---
+       
+    // Efectos de Compañero
+    if (effect.companion_energy) {
+      state.player.companion.energy += effect.companion_energy;
+      if (state.player.companion.energy > state.player.companion.maxEnergy) {
+        state.player.companion.energy = state.player.companion.maxEnergy;
+      }
+    }
+  }
+
+        // --- INICIO: LÓGICA DE COMBATE POKÉMON ---
 
 // Variable global para guardar el estado del combate
 let combatState = {
@@ -1344,16 +1353,6 @@ function endCombat(didPlayerWin) {
 }
 
 // --- FIN: LÓGICA DE COMBATE POKÉMON ---
-    
-    // Efectos de Compañero
-    if (effect.companion_energy) {
-      state.player.companion.energy += effect.companion_energy;
-      if (state.player.companion.energy > state.player.companion.maxEnergy) {
-        state.player.companion.energy = state.player.companion.maxEnergy;
-      }
-    }
-  }
-
   function renderTabs(){
     tabsEl.innerHTML = "";
     TABS.forEach(tab => {
@@ -3053,6 +3052,7 @@ function renderLeaderboardTab() {
 </div>
 </body>
 </html>
+
 
 
 
