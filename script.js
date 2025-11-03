@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyB-WpVyjAgZEHyfqZ9caHaS9vEQbpjSX8I",
   authDomain: "vida-rpg-f2dbf.firebaseapp.com",
   projectId: "vida-rpg-f2dbf",
-  storageBucket: "vida-rpg-f2dbf.firebasestorage.app",
+  storageBucket: "vida-rpg-f2dbf.appspot.com",
   messagingSenderId: "273885218531",
   appId: "1:273885218531:web:41367ac017df3c15e667d6",
   measurementId: "G-NL9EXH9GS3",
