@@ -2851,7 +2851,236 @@ function renderLeaderboardTab() {
     });
 }
 // --- FIN DE LÓGICA DE LEADERBOARD ---
+// --- INICIO: LÓGICA DE COMBATE POKÉMON ---
 
+let combatState = {
+  active: false,
+  playerHP: 0,
+  playerMaxHP: 0,
+  enemyHP: 0,
+  enemyMaxHP: 500,
+  enemyName: "Golem de Piedra",
+  enemyBaseDamage: 25,
+  canRetry: true
+};
+
+// Función de la Pestaña "Foso" (el lobby)
+function renderFosoTab() {
+  const COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
+  const now = Date.now();
+  const lastWin = state.player.lastBossWin || 0;
+  const cooldownLeft = COOLDOWN_MS - (now - lastWin);
+  const isReady = cooldownLeft <= 0;
+  const canAfford = state.player.credits >= 50;
+
+  let html = `<h2>🗿 El Foso de los Retos</h2>
+    <p style="color:var(--muted); margin-top: 4px;">¡Desafía al Jefe Semanal! Si ganas, obtendrás recompensas únicas. Si pierdes, pierdes tu apuesta.</p>`;
+
+  if (isReady) {
+    html += `<button class="button" id="btn-start-boss" ${canAfford ? '' : 'disabled'}>
+                Desafiar al Jefe (Cuesta 50 Créditos)
+              </button>`;
+    if (!canAfford) html += `<p style="color:var(--stat-fue); font-size: 12px;">No tienes suficientes créditos.</p>`;
+  } else {
+    html += `<p style="color:var(--accent2); font-size: 16px;">¡Ya has derrotado al Jefe esta semana!</p>
+              <p>Siguiente desafío en: <b>${formatTime(cooldownLeft)}</b></p>`;
+  }
+  contentEl.innerHTML = html;
+
+  if (isReady && canAfford) {
+    document.getElementById("btn-start-boss").onclick = startCombat;
+  }
+}
+
+// Iniciar el combate
+function startCombat() {
+  if (state.player.credits < 50) return;
+
+  // Pagar el costo
+  state.player.credits -= 50;
+  state.player.diary.push(`¡Pagaste 50 Créditos para entrar al Foso!`);
+
+  // Inicializar estado del combate
+  combatState.active = true;
+  combatState.playerMaxHP = state.player.maxHp;
+  combatState.playerHP = state.player.hp;
+  combatState.enemyHP = combatState.enemyMaxHP;
+
+  // Actualizar la UI de batalla
+  document.getElementById('player-battle-name').textContent = state.player.name;
+  document.getElementById('enemy-name').textContent = combatState.enemyName;
+
+  // Limpiar el log de batalla
+  document.getElementById('battle-log').innerHTML = `<p>¡Un ${combatState.enemyName} te desafía!</p>`;
+
+  // Asignar acciones a los botones
+  document.getElementById('btn-att-fue').onclick = () => playerAttack('fue');
+  document.getElementById('btn-att-des').onclick = () => playerAttack('des');
+  document.getElementById('btn-att-int').onclick = () => playerAttack('int');
+  document.getElementById('btn-att-car').onclick = () => playerAttack('car');
+
+  // Mostrar la pantalla de batalla
+  updateBattleUI();
+  document.getElementById('battle-overlay').style.display = 'block';
+}
+
+// Función para actualizar toda la UI de batalla
+function updateBattleUI() {
+  // --- JUGADOR ---
+  document.getElementById('player-hp-text').textContent = `${combatState.playerHP} / ${combatState.playerMaxHP}`;
+  const playerHPPct = (combatState.playerHP / combatState.playerMaxHP) * 100;
+  const playerBar = document.getElementById('player-hp-bar');
+  playerBar.style.width = `${playerHPPct}%`;
+  // Clase de color HP
+  playerBar.className = "hp-bar-inner";
+  if (playerHPPct < 20) playerBar.classList.add('low');
+  else if (playerHPPct < 50) playerBar.classList.add('medium');
+
+  // --- ENEMIGO ---
+  document.getElementById('enemy-hp-text').textContent = `${combatState.enemyHP} / ${combatState.enemyMaxHP}`;
+  const enemyHPPct = (combatState.enemyHP / combatState.enemyMaxHP) * 100;
+  const enemyBar = document.getElementById('enemy-hp-bar');
+  enemyBar.style.width = `${enemyHPPct}%`;
+  // Clase de color HP
+  enemyBar.className = "hp-bar-inner";
+  if (enemyHPPct < 20) enemyBar.classList.add('low');
+  else if (enemyHPPct < 50) enemyBar.classList.add('medium');
+}
+
+// Función para escribir en el diario de batalla
+function logToBattle(message) {
+  const log = document.getElementById('battle-log');
+  log.innerHTML = `<p>${message}</p>` + log.innerHTML; // Añade el mensaje al principio
+}
+
+// Toggle de botones
+function setBattleButtons(disabled) {
+  document.getElementById('btn-att-fue').disabled = disabled;
+  document.getElementById('btn-att-des').disabled = disabled;
+  document.getElementById('btn-att-int').disabled = disabled;
+  document.getElementById('btn-att-car').disabled = disabled;
+}
+
+// 💥 ¡Tu Turno! 💥
+function playerAttack(stat) {
+  if (!combatState.active) return;
+  setBattleButtons(true); // Desactivar botones mientras se procesa el turno
+
+  let damage = 0;
+  let dodgeChance = 0;
+  let stunChance = 0;
+  let heal = 0;
+
+  // 1. Calcular acción
+  switch (stat) {
+    case 'fue':
+      damage = Math.round(state.player.attributes.fue * 2);
+      logToBattle(`💥 ¡Usas Golpe Brutal! Haces ${damage} de daño.`);
+      break;
+    case 'des':
+      damage = Math.round(state.player.attributes.des * 1.5);
+      dodgeChance = 0.4; // 40%
+      logToBattle(`💨 ¡Usas Golpe Ágil! Haces ${damage} de daño.`);
+      break;
+    case 'int':
+      damage = Math.round(state.player.attributes.int * 1.5);
+      stunChance = 0.2; // 20%
+      logToBattle(`🧠 ¡Buscas un Punto Débil! Haces ${damage} de daño.`);
+      break;
+    case 'car':
+      heal = Math.round(state.player.attributes.car * 2);
+      combatState.playerHP += heal;
+      if (combatState.playerHP > combatState.playerMaxHP) combatState.playerHP = combatState.playerMaxHP;
+      logToBattle(`💖 ¡Usas Grito de Ánimo! Te curas ${heal} HP.`);
+      break;
+  }
+
+  // 2. Aplicar daño al enemigo (si lo hay)
+  if (damage > 0) {
+    combatState.enemyHP -= damage;
+  }
+
+  // 3. Revisar si el enemigo murió
+  if (combatState.enemyHP <= 0) {
+    combatState.enemyHP = 0;
+    updateBattleUI();
+    logToBattle("¡Has derrotado al " + combatState.enemyName + "!");
+    setTimeout(() => endCombat(true), 2000); // Ganaste
+    return;
+  }
+
+  // 4. Actualizar UI y pasar al turno del enemigo
+  updateBattleUI();
+  setTimeout(() => enemyAttack(dodgeChance, stunChance), 1500); // Esperar 1.5s
+}
+
+// 👹 ¡Turno del Enemigo! 👹
+function enemyAttack(playerDodgeChance, enemyStunChance) {
+  if (!combatState.active) return;
+
+  // 1. Revisar Stun
+  if (Math.random() < enemyStunChance) {
+    logToBattle("¡El Golem está aturdido y pierde su turno!");
+    setBattleButtons(false); // Reactivar botones
+    return;
+  }
+
+  // 2. Revisar Esquivar
+  if (Math.random() < playerDodgeChance) {
+    logToBattle("¡El Golem ataca, pero lo esquivas ágilmente!");
+    setBattleButtons(false); // Reactivar botones
+    return;
+  }
+
+  // 3. Recibir Daño
+  // El daño del jefe se reduce un poco por tu FUE (defensa)
+  let defense = Math.round(state.player.attributes.fue * 0.5);
+  let damageTaken = combatState.enemyBaseDamage - defense;
+  if (damageTaken < 5) damageTaken = 5; // Mínimo 5 de daño
+
+  combatState.playerHP -= damageTaken;
+  logToBattle(`💢 ¡El Golem te golpea! Recibes ${damageTaken} de daño.`);
+
+  // 4. Revisar si moriste
+  if (combatState.playerHP <= 0) {
+    combatState.playerHP = 0;
+    updateBattleUI();
+    logToBattle("¡Has sido derrotado!");
+    setTimeout(() => endCombat(false), 2000); // Perdiste
+    return;
+  }
+
+  // 5. Sobreviviste, fin del turno
+  updateBattleUI();
+  setBattleButtons(false); // Reactivar botones
+}
+
+// Fin del combate
+function endCombat(didPlayerWin) {
+  combatState.active = false;
+  document.getElementById('battle-overlay').style.display = 'none'; // Ocultar pantalla
+
+  if (didPlayerWin) {
+    logToBattle("¡VICTORIA!"); // Log para el diario de batalla
+    const msg = `🏆 ¡Has derrotado al ${combatState.enemyName} en el Foso!`;
+    state.player.diary.push(msg);
+    showToast(msg, "success");
+    state.player.lastBossWin = Date.now(); // Poner cooldown
+    applyEffect({ xp: 300, gemas: 2 }); // ¡La gran recompensa!
+  } else {
+    logToBattle("DERROTA..."); // Log para el diario de batalla
+    const msg = `☠️ ¡Has sido derrotado en el Foso! Perdiste 50 Créditos.`;
+    state.player.diary.push(msg);
+    showToast(msg, "error");
+    state.player.hp = 1; // Dejarte con 1 HP en el juego principal
+  }
+
+  checkLevelUp();
+  saveState();
+  renderAll(); // Actualizar la UI principal
+  renderTab("Foso"); // Refrescar la pestaña del Foso
+} 
+// --- FIN: LÓGICA DE COMBATE POKÉMON ---
 // --- INICIALIZACIÓN ---
 checkMimoReset();
 checkHabitReset();
