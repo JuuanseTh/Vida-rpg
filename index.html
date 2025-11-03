@@ -3217,14 +3217,14 @@ function renderLeaderboardTab() {
   // --- Bucle de Fondo ---
   setInterval(() => {
     const tabActual = document.querySelector(".tab.active")?.textContent;
-    checkMissionCooldowns();
-    checkCompanion(); 
-    checkMimoReset(); 
-    
-    if (tabActual === "Missions") renderTab("Missions");
-    if (tabActual === "Player") renderTab("Player"); 
-    if (tabActual === "Compañero") renderTab("Compañero"); 
-    if (tabActual === "Casino") renderTab("Casino"); 
+checkMissionCooldowns();
+checkCompanion(); 
+checkMimoReset(); 
+
+if (tabActual === "Missions") renderTab("Missions");
+if (tabActual === "Player") renderTab("Player"); 
+if (tabActual === "Compañero") renderTab("Compañero"); 
+if (tabActual === "Casino") renderTab("Casino");
     
   }, 30000); 
   
@@ -3276,6 +3276,7 @@ function renderLeaderboardTab() {
 </div>
 </body>
 </html>
+
 
 
 
