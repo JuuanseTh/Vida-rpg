@@ -750,7 +750,7 @@ const RANDOM_EVENTS = [
   // --- DATOS DE LOGIN ---
   lastLoginDate: null,
   loginStreak: 0, // <-- ¡¡COMA ARREGLADA!!
-  lastBossWin: null
+ 
 
 }, // <-- Esta es la llave de cierre de 'player'
     // --- LISTA COMPLETA DE 40 MISIONES ---
@@ -2524,7 +2524,7 @@ function endCombat(didPlayerWin) {
     else if (tab === "Configuración") renderConfiguracionTab();
     else if (tab === "Achievements") renderAchievementsTab();
     else if (tab === "Leaderboard") renderLeaderboardTab();
-    else if (tab === "Foso") renderFosoTab();
+    
   }
 
   // --- RENDER: Obstáculo ---
@@ -2861,6 +2861,7 @@ if (tabActual === "Casino") renderTab("Casino");
   
 </body>
 </html>
+
 
 
 
