@@ -1068,7 +1068,7 @@ footer {
 }
 
 /* ARREGLADO: Aplicar estilo a los botones por ID, no por clase */
-#battle-actions button {
+  .battle-btn, #battle-actions button {
   width: 100%;
   height: 100%;
   margin: 0;
