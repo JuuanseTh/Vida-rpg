@@ -116,7 +116,52 @@
     </div>
 
     <div id="toast-container"></div>
+    <div id="battle-overlay">
+  <div id="battle-scene">
 
+    <div class="battle-zone" id="enemy-zone">
+      <div class="battle-status-box" id="enemy-status">
+        <div id="enemy-name">Golem de Piedra</div>
+        <div class="hp-bar-container">
+          <div class="hp-bar-label">HP</div>
+          <div class="hp-bar">
+            <div id="enemy-hp-bar" class="hp-bar-inner" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div id="enemy-hp-text">500 / 500</div>
+      </div>
+      <div class="battle-sprite" id="enemy-sprite">🗿</div>
+    </div>
+
+    <div class="battle-zone" id="player-zone">
+      <div class="battle-sprite" id="player-sprite">👤</div>
+      <div class="battle-status-box" id="player-status">
+        <div id="player-battle-name">Player</div>
+        <div class="hp-bar-container">
+          <div class="hp-bar-label">HP</div>
+          <div class="hp-bar">
+            <div id="player-hp-bar" class="hp-bar-inner" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div id="player-hp-text">100 / 100</div>
+      </div>
+    </div>
+
+    <div id="battle-menu-container">
+      <div id="battle-log">
+        <p>¡Un Golem de Piedra salvaje apareció!</p>
+      </div>
+      <div id="battle-actions">
+        <button class="battle-btn" id="btn-att-fue">[FUE] Golpe Brutal</button>
+        <button class="battle-btn" id="btn-att-des">[DES] Golpe Ágil</button>
+        <button class="battle-btn" id="btn-att-int">[INT] Punto Débil</button>
+        <button class="battle-btn" id="btn-att-car">[CAR] Grito de Ánimo</button>
+      </div>
+    </div>
+
+  </div>
+</div>
     <script src="script.js"></script>
   </body>
 </html>
+
