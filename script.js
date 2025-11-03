@@ -993,15 +993,18 @@ function applyEffect(effect) {
   // 2. APLICAR VALORES
   if (effect.xp) {
     state.player.xp += Math.round(effect.xp * (1 + xp_bonus));
+    animateStat("xp");
   }
   if (effect.hp) {
     state.player.hp += effect.hp;
     if (state.player.hp > state.player.maxHp)
       state.player.hp = state.player.maxHp;
     if (state.player.hp < 0) state.player.hp = 0;
+    animateStat("hp");
   }
   if (effect.credits) {
     state.player.credits += Math.round(effect.credits * (1 + credits_bonus));
+    animateStat("credits");
   }
   if (effect.maxHp) {
     // Para equipo
@@ -1039,6 +1042,33 @@ function showToast(message, type = "info") {
     toast.style.transform = "translateX(100%)";
     setTimeout(() => toast.remove(), 500); // Esperar que la animación de salida termine
   }, 3000); // 3 segundos
+}
+
+// --- MEJORA UX: Función de Animación de Stats ---
+function animateStat(statKey) {
+  let el;
+  if (statKey === "xp") {
+    el = document.getElementById("player-xp-text");
+  } else if (statKey === "hp") {
+    el = document.getElementById("player-hp-text");
+  } else if (statKey === "credits") {
+    el = document.getElementById("player-credits");
+  } else if (statKey === "pa") {
+    el = document.getElementById("player-pa");
+  } else if (statKey === "level") {
+    el = document.getElementById("player-level");
+  }
+
+  if (el) {
+    // Añadimos la clase de CSS
+    el.classList.add("animate-pop");
+    
+    // Quitamos la clase después de que termine la animación
+    // para que pueda volver a usarse
+    setTimeout(() => {
+      el.classList.remove("animate-pop");
+    }, 400); // 400ms es la duración de la animación
+  }
 }
 
 // --- MEJORA UX: Sistema de Ventana Modal ---
@@ -2015,14 +2045,25 @@ function checkLevelUp() {
   while (state.player.xp >= state.player.xptnl) {
     state.player.xp = state.player.xp - state.player.xptnl;
     state.player.level++;
+    animateStat("level");
     state.player.attributePoints += 5;
+    animateStat("pa");
     state.player.hp = state.player.maxHp;
+    animateStat("hp");
     state.player.xptnl = Math.floor(state.player.xptnl * 1.5);
 
     const levelMsg = `¡SUBISTE AL NIVEL ${state.player.level}! Ganas 5 Puntos de Atributo (PA).`;
     state.player.diary.push(levelMsg);
     showToast(levelMsg, "success");
     updateLeaderboard(state.player.name, state.player.level);
+    // ¡AQUÍ LA MAGIA DEL FLASH! (BLOQUE AÑADIDO)
+    const playerCard = document.getElementById("player-name").closest(".card");
+    if (playerCard) {
+      playerCard.classList.add("animate-flash");
+      setTimeout(() => {
+        playerCard.classList.remove("animate-flash");
+      }, 1200); // 1200ms es la duración de la animación
+    }
 
     checkAchievements();
   }
