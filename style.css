@@ -1089,3 +1089,42 @@ footer {
   cursor: not-allowed;
 }
 /* --- FIN: CSS DE COMBATE POKÉMON --- */
+/* --- Animaciones de Feedback --- */
+@keyframes text-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+    color: var(--accent2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Clase que podemos añadir con JS */
+.animate-pop {
+  animation: text-pop 0.4s ease-out;
+}
+
+@keyframes card-flash {
+  0% {
+    box-shadow: var(--shadow);
+    border-color: var(--card-light);
+  }
+  50% {
+    /* Usamos el color de XP para el brillo */
+    box-shadow: 0 0 30px 5px var(--xp-color);
+    border-color: var(--xp-color);
+  }
+  100% {
+    box-shadow: var(--shadow);
+    border-color: var(--card-light);
+  }
+}
+
+/* Clase que podemos añadir con JS */
+.animate-flash {
+  animation: card-flash 1.2s ease-in-out;
+}
