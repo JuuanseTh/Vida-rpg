@@ -15,24 +15,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vida RPG — Visual</title>
   <style>
-    :root {
-      --bg: #0c111f;
-      --card: #1b2434;
-      --accent1: #6ea8fe;
-      --accent2: #44c8db;
-      --text: #e6eef8;
-      --muted: #8ca3b1;
-      --shadow: 0 8px 24px rgba(0,0,0,0.7);
-      --radius: 14px;
-      
-      --bar-bg: var(--bg);  
-      --stat-fue: #f44336;
-      --stat-int: #2196F3;
-      --stat-des: #4caf50;
-      --stat-car: #ff9800;
-    }
-    /* --- INICIO: CSS DE COMBATE POKÉMON --- */
+  :root {
+  --bg: #0c111f;
+  --card: #1b2434;
+  --accent1: #6ea8fe;
+  --accent2: #44c8db;
+  --text: #e6eef8;
+  --muted: #8ca3b1;
+  --shadow: 0 8px 24px rgba(0,0,0,0.7);
+  --radius: 14px;
 
+  --bar-bg: var(--bg);  
+  --stat-fue: #f44336;
+  --stat-int: #2196F3;
+  --stat-des: #4caf50;
+  --stat-car: #ff9800;
+}
+
+/* --- INICIO: CSS DE COMBATE POKÉMON --- */
 #battle-overlay {
   display: none; /* Oculto por defecto */
   position: fixed; /* Cubre toda la pantalla */
@@ -45,7 +45,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   padding: 10px;
   font-family: monospace; /* ¡Estilo retro! */
 }
-
 #battle-scene {
   width: 100%;
   height: 100%;
@@ -55,18 +54,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   border-radius: var(--radius);
   background: var(--bg);
 }
-
 .battle-zone {
   flex-grow: 1;
   position: relative;
 }
-
 .battle-sprite {
   font-size: 100px;
   position: absolute;
 }
-
-/* Posición Estilo Pokémon */
 #enemy-sprite {
   top: 10%;
   right: 15%;
@@ -76,7 +71,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   left: 15%;
   font-size: 80px;
 }
-
 .battle-status-box {
   position: absolute;
   background: var(--card);
@@ -86,8 +80,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   width: 250px;
   box-shadow: var(--shadow);
 }
-
-/* Posición Estilo Pokémon */
 #enemy-status {
   top: 20px;
   left: 20px;
@@ -96,7 +88,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   bottom: 150px; /* Justo encima del menú */
   right: 20px;
 }
-
 .hp-bar-container {
   display: flex;
   align-items: center;
@@ -121,18 +112,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   background: var(--stat-des); /* Verde */
   transition: width 0.5s;
 }
-/* El HP se pone rojo cuando está bajo */
 .hp-bar-inner.low { background: var(--stat-fue); }
 .hp-bar-inner.medium { background: var(--stat-car); }
-
-
 #battle-menu-container {
   height: 130px; /* Altura fija para el menú */
   width: 100%;
   border-top: 4px solid var(--text);
   display: flex;
 }
-
 #battle-log {
   flex-grow: 1;
   background: var(--card);
@@ -141,7 +128,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   line-height: 1.4;
   overflow-y: auto;
 }
-
 #battle-actions {
   width: 400px; /* Ancho fijo para los 4 botones */
   display: grid;
@@ -149,7 +135,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   grid-template-rows: 1fr 1fr;
   border-left: 4px solid var(--text);
 }
-
 #battle-actions button {
   /* Reseteamos estilos de .button */
   width: 100%;
@@ -172,418 +157,420 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   cursor: not-allowed;
 }
 /* --- FIN: CSS DE COMBATE POKÉMON --- */
-    * { box-sizing: border-box; margin:0; padding:0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-    .container {
-      width: 100%;
-      max-width: 1000px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    header h1 {
-      font-size: 28px;
-      color: var(--accent1);
-    }
-    .tabs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap; /* Para que quepan más pestañas */
-    }
-    .tab {
-      padding: 8px 16px;
-      background: var(--card);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .tab.active {
-      background: var(--accent1);
-      color: var(--bg);
-    }
-    main {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-    }
-    aside {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-    }
-    .player-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .player-name {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--accent2);
-    }
-    .stat {
-      margin-top: 12px;
-    }
-    .stat label {
-      font-size: 14px;
-      color: var(--muted);
-    }
-    .stat .value {
-      font-size: 20px;
-    }
-    
-    .log {
-      max-height: 180px;
-      overflow-y: auto;
-      background: var(--bar-bg); 
-      border: 1px solid var(--card); 
-      border-radius: var(--radius);
-      padding: 10px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-    
-    .table-wrapper {
-      overflow-x: auto; /* Permite scroll horizontal */
-    }
-    
-    table {
-      width: 100%;
-      min-width: 800px; /* Ancho mínimo para que no se comprima */
-      border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-    table th, table td {
-      padding: 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      text-align: left;
-      white-space: nowrap; /* Evita que el texto se rompa */
-    }
-    
-    table th:nth-child(2), table td:nth-child(2) {
-      white-space: normal; /* Permite que la descripción se rompa si es muy larga */
-    }
 
-    table input[type="text"] {
-      background: var(--bg);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text);
-      padding: 4px;
-      border-radius: 6px;
-      font-size: 14px;
-      width: 100%; 
-      min-width: 300px; /* Ancho mínimo para el input */
-    }
-     table select {
-      background: var(--bg);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text);
-      padding: 4px;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    
-    .button {
-      margin-top: 12px;
-      padding: 10px 18px;
-      border: none;
-      border-radius: var(--radius);
-      background: var(--accent1);
-      color: var(--bg);
-      cursor: pointer;
-      transition: background 0.3s;
-      margin-right: 5px; 
-    }
-    .button:hover {
-      background: var(--accent2);
-    }
-    .button:disabled {
-      background: var(--muted);
-      cursor: not-allowed;
-    }
-    
-    .difficulty {
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
-      display: inline-block;
-    }
-    .difficulty-Facil { background: #4caf50; } 
-    .difficulty-Media { background: #ff9800; } 
-    .difficulty-Dificil { background: #f44336; } 
-    .difficulty-Epica { background: #9c27b0; } 
-    
-    /* --- CSS Logros --- */
-    .achievements-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    .achievement-card {
-      background: var(--bg);
-      border: 1px solid var(--card);
-      border-radius: var(--radius);
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      opacity: 0.5;
-      transition: all 0.3s;
-    }
-    .achievement-card.unlocked {
-      opacity: 1;
-      border-color: var(--accent2);
-    }
-    /* Logro Oculto */
-    .achievement-card.hidden-ach {
-      opacity: 1;
-      border-color: var(--stat-car);
-    }
-    .achievement-card.hidden-ach .achievement-icon {
-      filter: blur(4px);
-    }
-    .achievement-card.hidden-ach.unlocked .achievement-icon {
-      filter: none;
-    }
-    .achievement-card.hidden-ach.unlocked h3 {
-      color: var(--stat-car);
-    }
-    
-    /* --- CSS HÁBITOS --- */
-    .habits-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    .habit-card {
-      background: var(--bg);
-      border: 1px solid var(--card);
-      border-radius: var(--radius);
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .habit-details h3 { font-size: 18px; }
-    .habit-details p { font-size: 14px; color: var(--muted); }
-    .habit-controls { display: flex; align-items: center; gap: 10px; }
-    .habit-count { font-size: 20px; font-weight: bold; min-width: 30px; text-align: center; }
-    .habit-btn {
-      font-size: 20px;
-      font-weight: bold;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--accent1);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      line-height: 28px;
-    }
-    .habit-btn.minus { border-color: #f44336; }
-    
-    /* --- CSS HABILIDADES --- */
-    .skills-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .attribute-tree {
-      background: var(--bg);
-      border: 1px solid var(--card);
-      border-radius: var(--radius);
-      padding: 15px;
-    }
-    .attribute-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--card);
-    }
-    .attribute-header h3 { font-size: 20px; }
-    .attribute-header h3.fue { color: var(--stat-fue); }
-    .attribute-header h3.int { color: var(--stat-int); }
-    .attribute-header h3.des { color: var(--stat-des); }
-    .attribute-header h3.car { color: var(--stat-car); }
-    .attribute-points-spend {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .attribute-points-spend span { font-size: 22px; font-weight: bold; }
-    .skill-list { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
-    .skill {
-      opacity: 0.4;
-      border-left: 3px solid var(--muted);
-      padding-left: 10px;
-    }
-    .skill.unlocked {
-      opacity: 1;
-      border-left-color: var(--accent2);
-    }
-    .skill.can-buy {
-      opacity: 1;
-      cursor: pointer;
-      border-left-color: var(--accent1);
-    }
-    .skill.can-buy:hover { background: rgba(255,255,255,0.1); }
-    .skill h4 { font-size: 15px; }
-    .skill p { font-size: 13px; color: var(--muted); }
-    
-    /* --- CSS EQUIPAMIENTO --- */
-    .equipment-slots {
-      margin-top: 20px;
-      border-top: 1px solid var(--card);
-      padding-top: 15px;
-    }
-    .equipment-slot {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-    .equipment-slot .name { color: var(--muted); }
-    .equipment-slot .item { color: var(--accent2); font-weight: bold; }
-    
-    /* --- CSS PROYECTOS --- */
-    .project-card {
-      background: var(--bg);
-      border: 1px solid var(--card);
-      border-radius: var(--radius);
-      padding: 15px;
-      margin-top: 15px;
-    }
-    .project-card h3 { color: var(--accent2); }
-    .project-card p { font-size: 14px; color: var(--muted); margin-top: 4px; }
-    .progress-bar {
-      height: 24px;
-      background: var(--bg);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-top: 10px;
-      border: 1px solid var(--card);
-    }
-    .progress-bar-inner {
-      height: 100%;
-      width: 0%;
-      background: var(--stat-des);
-      transition: width 0.5s;
-      text-align: center;
-      line-height: 24px;
-      font-size: 12px;
-      font-weight: bold;
-      color: var(--bg);
-    }
-    
-    /* --- CSS OBSTÁCULO --- */
-    #obstacle-widget {
-      display: none; /* Oculto por defecto */
-    }
-    .obstacle-card {
-      border: 2px solid var(--stat-fue);
-      padding: 15px;
-    }
-    .obstacle-card h3 { color: var(--stat-fue); font-size: 18px; }
-    .obstacle-card p { font-size: 14px; margin-top: 4px; }
-    
-    /* --- CSS COMPAÑERO --- */
-    .companion-header {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .companion-icon {
-      font-size: 64px;
-      line-height: 1;
-    }
-    .companion-name {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .rarity-Común { color: var(--muted); }
-    .rarity-Poco-Común { color: var(--stat-car); }
-    .rarity-Raro { color: var(--accent1); }
-    .rarity-Épico { color: #d158d1; }
-    
-    .energy-bar {
-      height: 10px;
-      background: var(--bg);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-top: 6px;
-      border: 1px solid var(--card);
-    }
-    .energy-bar-inner {
-      height: 100%;
-      width: 0%;
-      background: var(--stat-des);
-      transition: width 0.5s;
-    }
-    
-    /* --- CSS MIMAR GATO --- */
-    .mimar-section {
-      margin-top: 20px;
-      border-top: 1px solid var(--card);
-      padding-top: 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    
-    /* --- CSS CASINO --- */
-    .casino-game {
-      text-align: center;
-      padding: 20px;
-    }
-    .casino-game .pot {
-      font-size: 48px;
-      font-weight: bold;
-      color: var(--stat-des);
-      margin: 10px 0;
-    }
-    .casino-game .round {
-      font-size: 20px;
-      color: var(--accent2);
-    }
-    .casino-actions {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-    }
-    
-    
-    footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    @media (max-width: 800px) {
+* { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+.container {
+  width: 100%;
+  max-width: 1000px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+header h1 {
+  font-size: 28px;
+  color: var(--accent1);
+}
+.tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap; /* Para que quepan más pestañas */
+}
+.tab {
+  padding: 8px 16px;
+  background: var(--card);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.tab.active {
+  background: var(--accent1);
+  color: var(--bg);
+}
+main {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.player-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--accent2);
+}
+.stat {
+  margin-top: 12px;
+}
+.stat label {
+  font-size: 14px;
+  color: var(--muted);
+}
+.stat .value {
+  font-size: 20px;
+}
+
+.log {
+  max-height: 180px;
+  overflow-y: auto;
+  background: var(--bar-bg); 
+  border: 1px solid var(--card); 
+  border-radius: var(--radius);
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.table-wrapper {
+  overflow-x: auto; /* Permite scroll horizontal */
+}
+
+table {
+  width: 100%;
+  min-width: 800px; /* Ancho mínimo para que no se comprima */
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 14px;
+}
+table th, table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  text-align: left;
+  white-space: nowrap; /* Evita que el texto se rompa */
+}
+
+table th:nth-child(2), table td:nth-child(2) {
+  white-space: normal; /* Permite que la descripción se rompa si es muy larga */
+}
+
+table input[type="text"] {
+  background: var(--bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text);
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%; 
+  min-width: 300px; /* Ancho mínimo para el input */
+}
+ table select {
+  background: var(--bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text);
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.button {
+  margin-top: 12px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent1);
+  color: var(--bg);
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-right: 5px; 
+}
+.button:hover {
+  background: var(--accent2);
+}
+.button:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+.difficulty {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+  display: inline-block;
+}
+.difficulty-Facil { background: #4caf50; } 
+.difficulty-Media { background: #ff9800; } 
+.difficulty-Dificil { background: #f44336; } 
+.difficulty-Epica { background: #9c27b0; } 
+
+/* --- CSS Logros --- */
+.achievements-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+.achievement-card {
+  background: var(--bg);
+  border: 1px solid var(--card);
+  border-radius: var(--radius);
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+.achievement-card.unlocked {
+  opacity: 1;
+  border-color: var(--accent2);
+}
+/* Logro Oculto */
+.achievement-card.hidden-ach {
+  opacity: 1;
+  border-color: var(--stat-car);
+}
+.achievement-card.hidden-ach .achievement-icon {
+  filter: blur(4px);
+}
+.achievement-card.hidden-ach.unlocked .achievement-icon {
+  filter: none;
+}
+.achievement-card.hidden-ach.unlocked h3 {
+  color: var(--stat-car);
+}
+
+/* --- CSS HÁBITOS --- */
+.habits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+.habit-card {
+  background: var(--bg);
+  border: 1px solid var(--card);
+  border-radius: var(--radius);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.habit-details h3 { font-size: 18px; }
+.habit-details p { font-size: 14px; color: var(--muted); }
+.habit-controls { display: flex; align-items: center; gap: 10px; }
+.habit-count { font-size: 20px; font-weight: bold; min-width: 30px; text-align: center; }
+.habit-btn {
+  font-size: 20px;
+  font-weight: bold;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--accent1);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  line-height: 28px;
+}
+.habit-btn.minus { border-color: #f44336; }
+
+/* --- CSS HABILIDADES --- */
+.skills-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.attribute-tree {
+  background: var(--bg);
+  border: 1px solid var(--card);
+  border-radius: var(--radius);
+  padding: 15px;
+}
+.attribute-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--card);
+}
+.attribute-header h3 { font-size: 20px; }
+.attribute-header h3.fue { color: var(--stat-fue); }
+.attribute-header h3.int { color: var(--stat-int); }
+.attribute-header h3.des { color: var(--stat-des); }
+.attribute-header h3.car { color: var(--stat-car); }
+.attribute-points-spend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attribute-points-spend span { font-size: 22px; font-weight: bold; }
+.skill-list { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+.skill {
+  opacity: 0.4;
+  border-left: 3px solid var(--muted);
+  padding-left: 10px;
+}
+.skill.unlocked {
+  opacity: 1;
+  border-left-color: var(--accent2);
+}
+.skill.can-buy {
+  opacity: 1;
+  cursor: pointer;
+  border-left-color: var(--accent1);
+}
+.skill.can-buy:hover { background: rgba(255,255,255,0.1); }
+.skill h4 { font-size: 15px; }
+.skill p { font-size: 13px; color: var(--muted); }
+
+/* --- CSS EQUIPAMIENTO --- */
+.equipment-slots {
+  margin-top: 20px;
+  border-top: 1px solid var(--card);
+  padding-top: 15px;
+}
+.equipment-slot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-top: 8px;
+}
+.equipment-slot .name { color: var(--muted); }
+.equipment-slot .item { color: var(--accent2); font-weight: bold; }
+
+/* --- CSS PROYECTOS --- */
+.project-card {
+  background: var(--bg);
+  border: 1px solid var(--card);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin-top: 15px;
+}
+.project-card h3 { color: var(--accent2); }
+.project-card p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.progress-bar {
+  height: 24px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 10px;
+  border: 1px solid var(--card);
+}
+.progress-bar-inner {
+  height: 100%;
+  width: 0%;
+  background: var(--stat-des);
+  transition: width 0.5s;
+  text-align: center;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--bg);
+}
+
+/* --- CSS OBSTÁCULO --- */
+#obstacle-widget {
+  display: none; /* Oculto por defecto */
+}
+.obstacle-card {
+  border: 2px solid var(--stat-fue);
+  padding: 15px;
+}
+.obstacle-card h3 { color: var(--stat-fue); font-size: 18px; }
+.obstacle-card p { font-size: 14px; margin-top: 4px; }
+
+/* --- CSS COMPAÑERO --- */
+.companion-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.companion-icon {
+  font-size: 64px;
+  line-height: 1;
+}
+.companion-name {
+  font-size: 24px;
+  font-weight: bold;
+}
+.rarity-Común { color: var(--muted); }
+.rarity-Poco-Común { color: var(--stat-car); }
+.rarity-Raro { color: var(--accent1); }
+.rarity-Épico { color: #d158d1; }
+
+.energy-bar {
+  height: 10px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 6px;
+  border: 1px solid var(--card);
+}
+.energy-bar-inner {
+  height: 100%;
+  width: 0%;
+  background: var(--stat-des);
+  transition: width 0.5s;
+}
+
+/* --- CSS MIMAR GATO --- */
+.mimar-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--card);
+  padding-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* --- CSS CASINO --- */
+.casino-game {
+  text-align: center;
+  padding: 20px;
+}
+.casino-game .pot {
+  font-size: 48px;
+  font-weight: bold;
+  color: var(--stat-des);
+  margin: 10px 0;
+}
+.casino-game .round {
+  font-size: 20px;
+  color: var(--accent2);
+}
+.casino-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+
+footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+@media (max-width: 800px) {
   body {
     padding: 10px; /* Menos padding en el body */
   }
@@ -604,42 +591,30 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     padding: 6px 12px; /* Pestañas un poco más pequeñas */
     font-size: 14px;
   }
-
-  /* Botones más grandes y apilados */
   .button {
     width: 100%; /* Ocupan todo el ancho */
     padding: 12px;
     margin-top: 10px;
     margin-right: 0;
   }
-
-  /* Ajustes de tablas */
   table input[type="text"] {
     min-width: 200px; /* Inputs más pequeños en la tabla */
   }
-
-  /* Apilar listas de 2 columnas */
   .achievements-list, .skills-container {
     grid-template-columns: 1fr;
   }
-
-  /* Apilar botones del casino */
   .casino-actions {
     flex-direction: column;
   }
-
-  /* Apilar sección de mimar gato */
   .mimar-section {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  /* Área del minijuego más pequeña */
   #minigame-area {
     height: 250px;
   }
 }
-    /* --- CSS MINI-JUEGO --- */
+/* --- CSS MINI-JUEGO --- */
 #minigame-container {
   text-align: center;
 }
@@ -674,7 +649,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   font-size: 18px;
   color: var(--accent2);
 }
-
   </style>
 </head>
 <body>
@@ -3280,6 +3254,7 @@ if (tabActual === "Casino") renderTab("Casino");
 </div>
 </body>
 </html>
+
 
 
 
