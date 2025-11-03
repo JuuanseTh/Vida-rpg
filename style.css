@@ -948,3 +948,144 @@ footer {
     margin-top: 0;
   }
 }
+/* --- INICIO: CSS DE COMBATE POKÉMON --- */
+
+#battle-overlay {
+  display: none; /* Oculto por defecto */
+  position: fixed; /* Cubre toda la pantalla */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: 999;
+  padding: 10px;
+  font-family: monospace; /* ¡Estilo retro! */
+}
+
+#battle-scene {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 4px solid var(--text);
+  border-radius: var(--radius-lg); /* Reutilizamos tu variable de radio */
+  background: var(--bg);
+}
+
+.battle-zone {
+  flex-grow: 1;
+  position: relative;
+}
+
+.battle-sprite {
+  font-size: 100px;
+  position: absolute;
+}
+
+/* Posición Estilo Pokémon */
+#enemy-sprite {
+  top: 10%;
+  right: 15%;
+}
+#player-sprite {
+  bottom: 5%;
+  left: 15%;
+  font-size: 80px;
+}
+
+.battle-status-box {
+  position: absolute;
+  background: var(--card);
+  border: 4px solid var(--text);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  width: 250px;
+  box-shadow: var(--shadow);
+}
+
+/* Posición Estilo Pokémon */
+#enemy-status {
+  top: 20px;
+  left: 20px;
+}
+#player-status {
+  bottom: 150px; /* Justo encima del menú */
+  right: 20px;
+}
+
+.hp-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+.hp-bar-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--stat-car);
+}
+.hp-bar {
+  flex-grow: 1;
+  height: 12px;
+  background: var(--bar-bg);
+  border-radius: 6px;
+  border: 1px solid var(--muted);
+  overflow: hidden;
+}
+.hp-bar-inner {
+  height: 100%;
+  background: var(--stat-des); /* Verde */
+  transition: width 0.5s;
+}
+/* El HP se pone rojo cuando está bajo */
+.hp-bar-inner.low { background: var(--hp-color); }
+.hp-bar-inner.medium { background: var(--stat-car); }
+
+
+#battle-menu-container {
+  height: 130px; /* Altura fija para el menú */
+  width: 100%;
+  border-top: 4px solid var(--text);
+  display: flex;
+}
+
+#battle-log {
+  flex-grow: 1;
+  background: var(--card);
+  padding: 15px;
+  font-size: 16px;
+  line-height: 1.4;
+  overflow-y: auto;
+}
+
+#battle-actions {
+  width: 400px; /* Ancho fijo para los 4 botones */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  border-left: 4px solid var(--text);
+}
+
+/* ARREGLADO: Aplicar estilo a los botones por ID, no por clase */
+#battle-actions button {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 10px;
+  border: 2px solid var(--text);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: monospace;
+  font-size: 16px;
+  cursor: pointer;
+}
+#battle-actions button:hover {
+  background: var(--accent1);
+}
+#battle-actions button:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+}
+/* --- FIN: CSS DE COMBATE POKÉMON --- */
