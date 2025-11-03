@@ -226,6 +226,7 @@ const INITIAL = {
     // --- DATOS DE LOGIN ---
     lastLoginDate: null,
     loginStreak: 0,
+    lastBossWin: null, 
   }, // <-- Esta es la llave de cierre de 'player'
   // --- LISTA COMPLETA DE 40 MISIONES ---
   missions: [
@@ -936,6 +937,7 @@ if (!state.player.companion.lastMimoReset)
 if (state.player.loginStreak === undefined) state.player.loginStreak = 0;
 if (!state.player.lastLoginDate) state.player.lastLoginDate = null;
 if (state.system.activeTheme === undefined) state.system.activeTheme = "";
+if (state.player.lastBossWin === undefined) state.player.lastBossWin = null; 
 
 // Recalcular Max HP al cargar
 state.player.maxHp =
@@ -2523,7 +2525,7 @@ function renderTab(tab) {
   else if (tab === "Compañero") renderCompañeroTab();
   else if (tab === "Minijuego") renderMinijuegoTab();
   else if (tab === "Missions") renderMissionsTab();
-  // else if (tab === "Foso") renderFosoTab(); // Descomentar si tienes Foso
+  else if (tab === "Foso") renderFosoTab();  Descomentar si tienes Foso
   else if (tab === "Proyectos") renderProyectosTab();
   else if (tab === "Inventario") renderInventarioTab();
   else if (tab === "Store") renderStoreTab();
