@@ -1070,7 +1070,21 @@ function animateStat(statKey) {
     }, 400); // 400ms es la duración de la animación
   }
 }
-
+// --- MEJORA UX: Función de Animación de Sprites de Batalla ---
+function animateSprite(spriteId, animationClass) {
+  const el = document.getElementById(spriteId);
+  if (el) {
+    el.classList.add(animationClass);
+    
+    // Determinar la duración para quitar la clase.
+    // Debe coincidir con la duración en el CSS.
+    const animationDuration = (animationClass === 'animate-heal-pulse') ? 600 : 500;
+    
+    setTimeout(() => {
+      el.classList.remove(animationClass);
+    }, animationDuration);
+  }
+}
 // --- MEJORA UX: Sistema de Ventana Modal ---
 const modalOverlay = document.getElementById("modal-overlay");
 const modalTitle = document.getElementById("modal-title");
@@ -2989,7 +3003,7 @@ function setBattleButtons(disabled) {
   document.getElementById('btn-att-car').disabled = disabled;
 }
 
-// 💥 ¡Tu Turno! 💥
+// 💥 ¡Tu Turno! 💥 (¡VERSIÓN 2.0 CON ANIMACIONES!)
 function playerAttack(stat) {
   if (!combatState.active) return;
   setBattleButtons(true); // Desactivar botones mientras se procesa el turno
@@ -2998,51 +3012,71 @@ function playerAttack(stat) {
   let dodgeChance = 0;
   let stunChance = 0;
   let heal = 0;
+  let animationDelay = 500; // 0.5s (duración de la animación lunge)
 
-  // 1. Calcular acción
+  // 1. Calcular acción y animar AL JUGADOR
   switch (stat) {
     case 'fue':
       damage = Math.round(state.player.attributes.fue * 2);
-      logToBattle(`💥 ¡Usas Golpe Brutal! Haces ${damage} de daño.`);
+      logToBattle(`💥 ¡Usas Golpe Brutal!`);
+      animateSprite('player-sprite', 'animate-player-lunge');
       break;
     case 'des':
       damage = Math.round(state.player.attributes.des * 1.5);
-      dodgeChance = 0.4; // 40%
-      logToBattle(`💨 ¡Usas Golpe Ágil! Haces ${damage} de daño.`);
+      dodgeChance = 0.4;
+      logToBattle(`💨 ¡Usas Golpe Ágil!`);
+      animateSprite('player-sprite', 'animate-player-lunge');
       break;
     case 'int':
       damage = Math.round(state.player.attributes.int * 1.5);
-      stunChance = 0.2; // 20%
-      logToBattle(`🧠 ¡Buscas un Punto Débil! Haces ${damage} de daño.`);
+      stunChance = 0.2;
+      logToBattle(`🧠 ¡Buscas un Punto Débil!`);
+      animationDelay = 100; // Es un ataque "mental", más rápido
       break;
     case 'car':
       heal = Math.round(state.player.attributes.car * 2);
       combatState.playerHP += heal;
       if (combatState.playerHP > combatState.playerMaxHP) combatState.playerHP = combatState.playerMaxHP;
       logToBattle(`💖 ¡Usas Grito de Ánimo! Te curas ${heal} HP.`);
+      animateSprite('player-sprite', 'animate-heal-pulse');
+      updateBattleUI(); // Actualizar HP curado inmediatamente
       break;
   }
 
-  // 2. Aplicar daño al enemigo (si lo hay)
+  // 2. Esperar a que la animación "conecte" (si hay daño)
   if (damage > 0) {
-    combatState.enemyHP -= damage;
-  }
+    
+    setTimeout(() => {
+      // 3. Animar al ENEMIGO y aplicar daño
+      animateSprite('enemy-sprite', 'animate-hit-shake');
+      combatState.enemyHP -= damage;
+      logToBattle(`¡Haces ${damage} de daño!`);
+      
+      // 4. Revisar si el enemigo murió
+      if (combatState.enemyHP <= 0) {
+        combatState.enemyHP = 0;
+        updateBattleUI(); // Actualizar UI
+        logToBattle("¡Has derrotado al " + combatState.enemyName + "!");
+        setTimeout(() => endCombat(true), 1500); // Esperar 1.5s y terminar
+        return;
+      }
 
-  // 3. Revisar si el enemigo murió
-  if (combatState.enemyHP <= 0) {
-    combatState.enemyHP = 0;
-    updateBattleUI();
-    logToBattle("¡Has derrotado al " + combatState.enemyName + "!");
-    setTimeout(() => endCombat(true), 2000); // Ganaste
-    return;
+      // 5. Sobrevivió, actualizar UI y pasar al turno del enemigo
+      updateBattleUI();
+      setTimeout(() => enemyAttack(dodgeChance, stunChance), 1500); // Esperar 1.5s
+      
+    }, animationDelay); // Esperar a que termine la animación de ataque
+  
+  } else if (heal > 0) {
+    // Si solo nos curamos, simplemente pasamos al turno enemigo
+    setTimeout(() => enemyAttack(dodgeChance, stunChance), 1500);
+  } else {
+    // Si no pasó nada (raro), reactivar
+    setBattleButtons(false);
   }
-
-  // 4. Actualizar UI y pasar al turno del enemigo
-  updateBattleUI();
-  setTimeout(() => enemyAttack(dodgeChance, stunChance), 1500); // Esperar 1.5s
 }
 
-// 👹 ¡Turno del Enemigo! 👹
+// 👹 ¡Turno del Enemigo! 👹 (¡VERSIÓN 2.0 CON ANIMACIONES!)
 function enemyAttack(playerDodgeChance, enemyStunChance) {
   if (!combatState.active) return;
 
@@ -3060,27 +3094,35 @@ function enemyAttack(playerDodgeChance, enemyStunChance) {
     return;
   }
 
-  // 3. Recibir Daño
-  // El daño del jefe se reduce un poco por tu FUE (defensa)
+  // 3. Calcular Daño y Animar al ENEMIGO
   let defense = Math.round(state.player.attributes.fue * 0.5);
   let damageTaken = combatState.enemyBaseDamage - defense;
   if (damageTaken < 5) damageTaken = 5; // Mínimo 5 de daño
+  
+  logToBattle(`💢 ¡El Golem te ataca!`);
+  animateSprite('enemy-sprite', 'animate-enemy-lunge');
 
-  combatState.playerHP -= damageTaken;
-  logToBattle(`💢 ¡El Golem te golpea! Recibes ${damageTaken} de daño.`);
+  // 4. Esperar a que la animación "conecte" (500ms)
+  setTimeout(() => {
+    // 5. Animar al JUGADOR y aplicar daño
+    animateSprite('player-sprite', 'animate-hit-shake');
+    combatState.playerHP -= damageTaken;
+    logToBattle(`¡Recibes ${damageTaken} de daño!`);
 
-  // 4. Revisar si moriste
-  if (combatState.playerHP <= 0) {
-    combatState.playerHP = 0;
+    // 6. Revisar si moriste
+    if (combatState.playerHP <= 0) {
+      combatState.playerHP = 0;
+      updateBattleUI();
+      logToBattle("¡Has sido derrotado!");
+      setTimeout(() => endCombat(false), 1500); // Esperar 1.5s y terminar
+      return;
+    }
+
+    // 7. Sobreviviste, fin del turno
     updateBattleUI();
-    logToBattle("¡Has sido derrotado!");
-    setTimeout(() => endCombat(false), 2000); // Perdiste
-    return;
-  }
-
-  // 5. Sobreviviste, fin del turno
-  updateBattleUI();
-  setBattleButtons(false); // Reactivar botones
+    setBattleButtons(false); // Reactivar botones
+    
+  }, 500); // 500ms = 0.5s (duración de la animación lunge del enemigo)
 }
 
 // Fin del combate
@@ -3088,25 +3130,31 @@ function endCombat(didPlayerWin) {
   combatState.active = false;
   document.getElementById('battle-overlay').style.display = 'none'; // Ocultar pantalla
 
-  if (didPlayerWin) {
-    logToBattle("¡VICTORIA!"); // Log para el diario de batalla
-    const msg = `🏆 ¡Has derrotado al ${combatState.enemyName} en el Foso!`;
-    state.player.diary.push(msg);
-    showToast(msg, "success");
-    state.player.lastBossWin = Date.now(); // Poner cooldown
-    applyEffect({ xp: 300, gemas: 2 }); // ¡La gran recompensa!
-  } else {
-    logToBattle("DERROTA..."); // Log para el diario de batalla
-    const msg = `☠️ ¡Has sido derrotado en el Foso! Perdiste 50 Créditos.`;
-    state.player.diary.push(msg);
-    showToast(msg, "error");
-    state.player.hp = 1; // Dejarte con 1 HP en el juego principal
-  }
+ // AÑADIR UN TIMEOUT para que el jugador vea el resultado
+  setTimeout(() => {
+    document.getElementById('battle-overlay').style.display = 'none'; // Ocultar pantalla
 
-  checkLevelUp();
-  saveState();
-  renderAll(); // Actualizar la UI principal
-  renderTab("Foso"); // Refrescar la pestaña del Foso
+    if (didPlayerWin) {
+      logToBattle("¡VICTORIA!"); // Log para el diario de batalla
+      const msg = `🏆 ¡Has derrotado al ${combatState.enemyName} en el Foso!`;
+      state.player.diary.push(msg);
+      showToast(msg, "success");
+      state.player.lastBossWin = Date.now(); // Poner cooldown
+      applyEffect({ xp: 300, gemas: 2 }); // ¡La gran recompensa!
+    } else {
+      logToBattle("DERROTA..."); // Log para el diario de batalla
+      const msg = `☠️ ¡Has sido derrotado en el Foso! Perdiste 50 Créditos.`;
+      state.player.diary.push(msg);
+      showToast(msg, "error");
+      state.player.hp = 1; // Dejarte con 1 HP en el juego principal
+    }
+
+    checkLevelUp();
+    saveState();
+    renderAll(); // Actualizar la UI principal
+    renderTab("Foso"); // Refrescar la pestaña del Foso
+    
+  }, 1000); // 1 segundo de espera
 } 
 // --- FIN: LÓGICA DE COMBATE POKÉMON ---
 // --- INICIALIZACIÓN ---
