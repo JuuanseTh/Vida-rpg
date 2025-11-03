@@ -2503,21 +2503,6 @@ function buyTheme(themeKey, price) {
     ); // Usar showToast
   }
 }
-
-// --- LÓGICA DE COMBATE (¡Aún usa alert! Queda pendiente) ---
-let combatState = {
-  active: false,
-  playerHP: 0,
-  playerMaxHP: 0,
-  enemyHP: 0,
-  enemyMaxHP: 500,
-  enemyName: "Golem de Piedra",
-  enemyBaseDamage: 25,
-  canRetry: true,
-};
-// (El resto de tu lógica de combate... Foso, startCombat, playerAttack, etc.)
-// ... (Tu lógica de Foso va aquí) ...
-
 // --- RENDER: Tab General ---
 function renderTab(tab) {
   if (tab === "Player") renderPlayerTab();
@@ -2525,7 +2510,7 @@ function renderTab(tab) {
   else if (tab === "Compañero") renderCompañeroTab();
   else if (tab === "Minijuego") renderMinijuegoTab();
   else if (tab === "Missions") renderMissionsTab();
-  else if (tab === "Foso") renderFosoTab();  Descomentar si tienes Foso
+  else if (tab === "Foso") renderFosoTab(); 
   else if (tab === "Proyectos") renderProyectosTab();
   else if (tab === "Inventario") renderInventarioTab();
   else if (tab === "Store") renderStoreTab();
