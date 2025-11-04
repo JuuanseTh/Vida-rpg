@@ -12,6 +12,20 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 // --- FIN DE INICIALIZACIÓN DE FIREBASE ---
 
+// --- CARGA DE SONIDOS ---
+const battleSounds = {
+  intro: new Audio("sounds/intro.mp3"),
+  heal: new Audio("sounds/heal.mp3"),
+  win: new Audio("sounds/win.mp3"),
+};
+
+// Bajar el volumen para que no sature
+Object.values(battleSounds).forEach((sound) => {
+  sound.volume = 0.4; // 40% del volumen
+});
+
+// --- FIN DE CARGA DE SONIDOS ---
+
 // --- CONFIGURACIÓN ---
 const DIFFICULTY_REWARDS = {
   Facil: { xp: 50, credits: 10, cooldownHours: 8 },
@@ -1085,6 +1099,16 @@ function animateSprite(spriteId, animationClass) {
     }, animationDuration);
   }
 }
+
+// --- MEJORA UX: Reproductor de Sonidos ---
+function playSound(soundName) {
+  const sound = battleSounds[soundName];
+  if (sound) {
+    sound.currentTime = 0; // Reiniciar el sonido (para que se pueda repetir rápido)
+    sound.play();
+  }
+}
+
 // --- MEJORA UX: Sistema de Ventana Modal ---
 const modalOverlay = document.getElementById("modal-overlay");
 const modalTitle = document.getElementById("modal-title");
@@ -2937,6 +2961,8 @@ function renderFosoTab() {
 // Iniciar el combate
 function startCombat() {
   if (state.player.credits < 50) return;
+  
+  playSound("intro");
 
   // Pagar el costo
   state.player.credits -= 50;
@@ -3039,6 +3065,7 @@ function playerAttack(stat) {
       if (combatState.playerHP > combatState.playerMaxHP) combatState.playerHP = combatState.playerMaxHP;
       logToBattle(`💖 ¡Usas Grito de Ánimo! Te curas ${heal} HP.`);
       animateSprite('player-sprite', 'animate-heal-pulse');
+      playSound("heal");
       updateBattleUI(); // Actualizar HP curado inmediatamente
       break;
   }
@@ -3136,6 +3163,7 @@ function endCombat(didPlayerWin) {
 
     if (didPlayerWin) {
       logToBattle("¡VICTORIA!"); // Log para el diario de batalla
+      playSound("win");
       const msg = `🏆 ¡Has derrotado al ${combatState.enemyName} en el Foso!`;
       state.player.diary.push(msg);
       showToast(msg, "success");
