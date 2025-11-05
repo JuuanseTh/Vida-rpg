@@ -254,7 +254,7 @@ table th:nth-child(2),
 table td:nth-child(2) {
   white-space: normal;
   word-break: break-word;
-  min-width: 200px;
+  min-width: 450px;
 }
 table tr:hover {
   background: var(--card-light);
